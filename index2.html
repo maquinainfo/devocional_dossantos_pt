@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Calendar, 
   BookOpen, 
@@ -10,7 +10,6 @@ import {
   Moon, 
   Menu,
   X,
-  Cross,
   Star,
   Scroll,
   Hourglass,
@@ -20,510 +19,529 @@ import {
   Users
 } from 'lucide-react';
 
-// --- BASE DE DADOS COMPLETA (DEZ 25 + JAN 26) ---
+// Componente personalizado para a Cruz Cristã (evita confusão com o 'X' da biblioteca)
+const ChristianCross = ({ size = 24, className = "", strokeWidth = 1.5 }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth={strokeWidth} 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M12 2v20" />
+    <path d="M7 9h10" />
+  </svg>
+);
+
+// --- BASE DE DADOS COMPLETA E APROFUNDADA (DEZ 25 + JAN 26) ---
 const SAINTS_DATA = {
   // === DEZEMBRO 2025 ===
   "1-12": {
     name: "São Carlos de Foucauld",
     title: "Presbítero e Eremita",
-    history: "Viveu uma juventude sem fé até se converter radicalmente. Quis imitar a 'vida oculta' de Jesus em Nazaré. Viveu no deserto do Saara entre os tuaregues, não para pregar com palavras, mas para ser o 'irmão universal'.",
-    reflection: "São Carlos nos ensina que, antes de falar de Jesus, precisamos *ser* Jesus para o outro. Num mundo de visibilidade, ele escolheu o último lugar. Ele nos convida a cavar um 'espaço de Nazaré' em nossa agenda: um silêncio onde Deus possa falar.",
-    prayer: "Pai, entrego-me em vossas mãos; fazei de mim o que vós quiserdes. Por tudo, eu vos dou graças.",
-    action: "Reze a 'Oração do Abandono' diante de uma dificuldade hoje."
+    history: "Nascido aristocrata na França, Carlos viveu uma juventude de dissipação, perdendo a fé e buscando prazeres mundanos. Durante uma expedição geográfica ao Marrocos, ficou impressionado com a fé muçulmana, o que despertou nele a pergunta: 'Deus existe?'. Sua conversão foi radical: 'Assim que compreendi que Deus existia, entendi que não podia fazer outra coisa senão viver só para Ele'. Passou anos na Terra Santa e em mosteiros trapistas, mas sentiu um chamado único: imitar a 'vida oculta' de Jesus em Nazaré não num convento, mas no deserto. Foi para o Saara, vivendo entre os tuaregues, não para pregar com sermões, mas para ser o 'irmão universal', traduzindo o Evangelho em amizade. Morreu assassinado em 1916, sem ter convertido ninguém, mas deixando um legado espiritual imenso.",
+    reflection: "São Carlos de Foucauld nos confronta com uma verdade desconcertante para o mundo moderno: a fecundidade espiritual não depende do sucesso visível, dos números ou do aplauso. Ele escolheu o último lugar, aquele que ninguém disputa, imitando a obscuridade dos trinta anos de Jesus em Nazaré. Sua vida no deserto nos ensina que, antes de falar de Jesus, precisamos *ser* Jesus para o outro através de uma caridade silenciosa e de uma presença eucarística. Ele nos convida a cavar um 'espaço de Nazaré' em nosso cotidiano ruidoso: um refúgio de silêncio interior onde a adoração precede a ação. Num tempo de ativismo frenético, ele nos lembra que o grito mais alto do Evangelho é a própria vida transformada pelo amor.",
+    prayer: "Pai, entrego-me em vossas mãos; fazei de mim o que vós quiserdes. Por tudo, eu vos dou graças. Estou pronto para tudo, aceito tudo.",
+    action: "Reze a 'Oração do Abandono' completa diante de uma dificuldade ou incerteza hoje."
   },
   "2-12": {
     name: "Santa Bibiana",
     title: "Virgem e Mártir",
-    history: "Mártir romana que perdeu toda a família na perseguição. Foi entregue a uma alcoviteira para ser corrompida, mas manteve sua pureza. Foi açoitada até a morte atada a uma coluna.",
-    reflection: "Bibiana (cheia de vida) mostra que a verdadeira vitalidade é espiritual. Tiraram-lhe tudo, mas não tiraram sua união com Cristo. Ela nos ensina a não negociar nossa consciência por conforto ou aprovação social.",
-    prayer: "Santa Bibiana, dai-nos a constância na fé e a pureza de coração.",
-    action: "Faça um ato de renúncia hoje para fortalecer sua vontade."
+    history: "Mártir romana do século IV, Bibiana pertenceu a uma família de cristãos devotos que foi dizimada pela perseguição do imperador Juliano, o Apóstata. Após ver seus pais serem martirizados e sua irmã morrer enquanto rezava, Bibiana foi entregue a uma alcoviteira perversa chamada Rufina, com a ordem de corrompê-la moralmente para que ela renegasse sua pureza e sua fé. Mas a jovem, fortificada pela oração contínua, permaneceu inabalável. Furioso com seu fracasso, o governador mandou amarrá-la a uma coluna e açoitá-la com chicotes de chumbo até a morte. Seu corpo foi deixado para os cães, mas permaneceu intacto até ser recolhido por cristãos.",
+    reflection: "O nome Bibiana significa 'cheia de vida', e sua história nos prova que a verdadeira vitalidade não é biológica, mas espiritual. Mesmo despojada de seus bens, de sua família, de sua liberdade física e de sua dignidade social, ela permaneceu soberana em sua alma, guardando o tesouro inegociável de sua união com Cristo. Seu martírio nos ensina que há valores absolutos pelos quais vale a pena morrer. Num mundo líquido que nos pressiona a vender nossa consciência por conforto, aceitação social ou carreira, Bibiana ergue-se como um farol de integridade. Ela nos lembra que podem tirar tudo de nós, exceto nossa liberdade interior de amar a Deus acima de todas as coisas.",
+    prayer: "Santa Bibiana, dai-nos a constância na fé e a pureza de coração que vence o mundo.",
+    action: "Faça um ato de renúncia hoje (comida, conforto ou vontade própria) para fortalecer seu caráter."
   },
   "3-12": {
     name: "São Francisco Xavier",
     title: "Padroeiro das Missões",
-    history: "Jesuíta que evangelizou a Índia e o Japão. Batizou multidões com as próprias mãos. Morreu olhando para a China, desejando levar Cristo a todos.",
-    reflection: "Xavier tinha pressa em salvar almas. Ele nos cura da indiferença. Se amamos Cristo, não podemos ficar calados. Nossa 'China' é o nosso trabalho e nossa família.",
-    prayer: "Senhor, dai-nos o zelo ardente de São Francisco Xavier.",
-    action: "Fale de Deus ou envie uma mensagem de fé para alguém hoje."
+    history: "Nobre de Navarra, Francisco era um estudante ambicioso em Paris até encontrar Santo Inácio de Loyola, que repetia incansavelmente: 'Que adianta ao homem ganhar o mundo inteiro se perder a sua alma?'. Convertido, tornou-se um dos primeiros jesuítas. Enviado para o Oriente, tornou-se o maior missionário da era moderna. Viajou pela Índia, Indonésia e Japão, enfrentando naufrágios, doenças e barreiras linguísticas. Batizou multidões com as próprias mãos, a ponto de sentir o braço paralisado de cansaço e a voz falhar. Morreu na ilha de Sanchoão, olhando para a China continental, consumido pelo desejo de levar Cristo àquele império fechado.",
+    reflection: "A vida de São Francisco Xavier é um remédio potente contra a nossa mediocridade e indiferença espiritual. Ele ardia com um 'fogo que acende outros fogos', incapaz de descansar enquanto houvesse uma única alma que não conhecesse o amor de Cristo. Xavier nos questiona profundamente: o que temos feito com o dom da fé que recebemos? Guardamos para nós como um consolo privado ou o compartilhamos como um tesouro urgente? Ele nos ensina que a missão não exige necessariamente cruzar oceanos geográficos; nossa 'Índia' e nosso 'Japão' podem ser nosso local de trabalho, nossa universidade ou nossa própria sala de estar. O amor verdadeiro não suporta o silêncio quando a salvação do outro está em jogo.",
+    prayer: "Senhor, dai-nos o zelo ardente de São Francisco Xavier pela salvação das almas.",
+    action: "Fale de Deus ou envie uma mensagem de fé e encorajamento para alguém hoje."
   },
   "4-12": {
     name: "São João Damasceno",
     title: "Doutor da Igreja",
-    history: "Defensor das imagens sacras contra os iconoclastas. Ensinou que, como Deus se fez carne, podemos pintar Sua face.",
-    reflection: "O cristianismo ama o que é palpável. Deus nos toca pelos sentidos. João nos convida a sermos 'ícones' vivos de Deus: imagens que refletem a glória divina.",
+    history: "Vivendo sob o califado muçulmano em Damasco, João ocupou altos cargos administrativos antes de se retirar para o mosteiro de São Sabas. Ficou famoso por sua defesa teológica das imagens sacras durante a crise iconoclasta, quando o imperador bizantino ordenou a destruição de ícones. Com uma lógica impecável, João argumentou que, na Encarnação, o Deus invisível se tornou visível. Negar a possibilidade de pintar a face de Cristo seria negar que Ele assumiu verdadeiramente a carne humana. Foi também um grande poeta e compositor de hinos litúrgicos.",
+    reflection: "São João Damasceno é o teólogo da beleza e da matéria santificada. Ao proteger os ícones, ele protegia a verdade central do Cristianismo: a Encarnação. Deus não é mais uma energia distante e abstrata, mas Alguém que se tornou visível, tocável, próximo. O cristianismo ama o que é palpável porque Deus nos redime através dos nossos sentidos. João nos convida a sermos, nós mesmos, 'ícones' vivos de Deus: imagens que, através de nossa conduta, misericórdia e alegria, reflitam a glória divina para um mundo que esqueceu o rosto do Criador. Ele nos lembra que a matéria não é má; ela foi assumida por Cristo para ser veículo de graça.",
     prayer: "São João Damasceno, ajudai-nos a ver em cada imagem sagrada uma janela para o Céu.",
-    action: "Reze diante de uma imagem sagrada hoje com reverência."
+    action: "Reze diante de uma imagem sagrada hoje, contemplando nela a humanidade de Deus."
   },
   "5-12": {
     name: "São Sabas",
     title: "Abade",
-    history: "Fundador de mosteiros no deserto da Judeia. Conhecido como 'torre inabalável' na defesa da fé verdadeira.",
-    reflection: "Sabas construiu vida no meio do deserto. Ele nos ensina a perseverança quando nossa vida espiritual parece árida. 'Cave fundo, a água brotará'.",
-    prayer: "Senhor, dai-nos a graça da perseverança final.",
-    action: "Mantenha sua oração hoje mesmo sem vontade sensível."
+    history: "Nascido na Capadócia, Sabas fugiu para o deserto da Judeia ainda jovem. Discípulo de grandes eremitas, viveu em cavernas e suportou a extrema solidão e aridez do deserto. Fundou a 'Grande Laura' (Mar Saba), um mosteiro espetacular encravado num desfiladeiro, que existe até hoje. Foi um organizador genial da vida monástica e um defensor intrépido da fé no Concílio de Calcedônia, sendo chamado de 'torre inabalável'. Sua autoridade moral era tamanha que até o imperador o consultava.",
+    reflection: "Sabas construiu uma cidade de oração no meio de um deserto árido e hostil. Sua vida é uma metáfora poderosa para os tempos de aridez espiritual que todos enfrentamos. Muitas vezes, nossa oração parece seca, sem gosto e sem consolo sensível; o 'deserto' interior parece interminável. É tentador abandonar tudo e voltar para o conforto. Mas São Sabas nos ensina a 'ficar', a permanecer e a cavar poços na rocha dura. Ele nos mostra que a fidelidade nos momentos de deserto é o que cria raízes profundas. A verdadeira vida espiritual não depende de sentir, mas de querer amar. 'Cave fundo, e a água viva brotará', mesmo no terreno mais improvável de nossas vidas.",
+    prayer: "Senhor, dai-nos a graça da perseverança final e da estabilidade no bem.",
+    action: "Mantenha sua oração hoje mesmo sem vontade sensível, oferecendo a aridez a Deus."
   },
   "6-12": {
     name: "São Nicolau de Mira",
     title: "Bispo",
-    history: "Famoso por sua caridade secreta (deu dotes a moças pobres). Defensor da divindade de Cristo no Concílio de Niceia.",
-    reflection: "A verdadeira caridade não busca aplausos. Nicolau nos prepara para o Natal lembrando que o maior presente é a dignidade do outro.",
-    prayer: "São Nicolau, ensinai-nos a generosidade discreta.",
-    action: "Faça um favor anônimo para alguém."
+    history: "Bispo na Ásia Menor (atual Turquia) no século IV, Nicolau sofreu prisão e tortura sob Diocleciano. Famoso por sua caridade secreta e defesa vigorosa da fé. A história mais célebre conta que ele lançou, na calada da noite, três sacos de ouro pela janela de um vizinho pobre que, desesperado, planejava prostituir suas três filhas por não ter dote para casá-las. No Concílio de Niceia, diz-se que ele confrontou o herege Ário com tanta veemência em defesa da divindade de Cristo que chegou a esbofeteá-lo.",
+    reflection: "Muito além da lenda folclórica do Papai Noel, São Nicolau foi um pastor zeloso que uniu a ortodoxia da fé com a ortopraxia da caridade. Ele nos ensina que a verdadeira generosidade busca o anonimato; ela quer resolver a dor do irmão, não alimentar o ego do doador. Nicolau nos prepara para o Natal lembrando que o maior presente que podemos dar a alguém é restaurar sua dignidade e esperança. Num mundo que faz marketing da bondade, ele nos convida à discrição do Evangelho: 'que a tua mão esquerda não saiba o que faz a direita'. A caridade cristã vê no pobre a própria carne de Cristo ferida, que precisa ser vestida e protegida.",
+    prayer: "São Nicolau, ensinai-nos a generosidade discreta e o amor à verdade.",
+    action: "Faça um favor ou doação anônima para alguém que precisa."
   },
   "7-12": {
     name: "Santo Ambrósio",
     title: "Bispo e Doutor",
-    history: "Bispo de Milão que converteu Santo Agostinho. Enfrentou o Imperador Teodósio exigindo penitência pública após um massacre.",
-    reflection: "A autoridade espiritual serve para curar, não para adular o poder. Ambrósio nos ensina a coerência: a fé deve iluminar a vida pública.",
-    prayer: "Ó Deus, dai à vossa Igreja pastores corajosos como Ambrósio.",
-    action: "Reze pelo seu Bispo e pelos sacerdotes."
+    history: "Governador de Milão que, ao tentar apaziguar uma disputa na catedral, foi aclamado bispo pelo povo, embora ainda fosse catecúmeno. Batizado e ordenado em uma semana, tornou-se um gigante intelectual e espiritual. Converteu Santo Agostinho com sua pregação e a beleza de seus hinos. Sua coragem foi lendária: enfrentou o Imperador Teodósio, o homem mais poderoso do mundo, barrando-o na porta da igreja e exigindo penitência pública após o imperador ordenar um massacre em Tessalônica.",
+    reflection: "Santo Ambrósio encarna a liberdade soberana da Igreja diante do poder temporal. Ele nos ensina que a autoridade espiritual existe para curar as almas e defender a justiça, nunca para adular os poderosos ou buscar privilégios. Sua coragem ao confrontar o Imperador mostra que a Lei de Deus está acima de qualquer lei humana ou cargo político. Ambrósio nos convida à coerência radical: nossa fé não pode ficar trancada na sacristia; ela deve iluminar nossa vida pública, nossas decisões profissionais e nossa cidadania. Ser cristão é ser sal da terra, e o sal que não salga não serve para nada além de ser pisado.",
+    prayer: "Ó Deus, dai à vossa Igreja pastores corajosos e sábios como Ambrósio.",
+    action: "Reze pelo seu Bispo e pelos sacerdotes de sua diocese."
   },
   "8-12": {
     name: "Imaculada Conceição",
     title: "Solenidade",
-    history: "Maria foi preservada do pecado original desde a concepção. Ela é a 'Cheia de Graça', o sonho de Deus para a humanidade.",
-    reflection: "Em Maria, vemos a vitória da graça. Ela é o sinal de que o mal não tem a última palavra. Peçamos a ela um coração que tenha horror ao pecado.",
+    history: "Dogma de fé definido em 1854, mas crido desde os primórdios, que declara que Maria foi preservada da mancha do pecado original desde o primeiro instante de sua concepção, em vista dos méritos futuros de Cristo. Ela é a 'Cheia de Graça', o vaso puro preparado por Deus para acolher o Infinito. Diferente de nós, que somos libertados do pecado pelo Batismo, Maria foi preservada dele, como alguém que é vacinado antes de ser exposto à doença.",
+    reflection: "Na Imaculada Conceição, contemplamos o sonho original de Deus para a humanidade: um ser humano totalmente livre do egoísmo, totalmente transparente à graça, vivendo em harmonia perfeita com o Criador. Em Maria, vemos que o pecado não é 'natural' ao homem; o pecado é o que nos desumaniza e nos diminui. Ela, sendo imaculada, é a mais humana de todos nós. Esta festa é um sinal de esperança inabalável: o mal, por mais forte e antigo que pareça, não tem a última palavra. A graça é maior e anterior. Maria é a aurora de um mundo novo. Ao olharmos para sua pureza, não devemos sentir inveja ou distância, mas um chamado a lutar contra tudo o que mancha nossa dignidade de filhos de Deus.",
     prayer: "Ó Maria, concebida sem pecado, rogai por nós que recorremos a Vós.",
-    action: "Use algo branco ou ofereça uma flor a Maria em honra à sua pureza."
+    action: "Use algo branco ou ofereça uma flor a Maria em honra à sua pureza interior."
   },
   "9-12": {
     name: "São Juan Diego",
     title: "Vidente de Guadalupe",
-    history: "O índio simples a quem a Virgem apareceu. Em sua tilma (manto), ficou impressa a imagem milagrosa de Guadalupe.",
-    reflection: "Deus escolhe o que é fraco para confundir o forte. Juan Diego se achava indigno, mas Maria disse: 'É preciso que sejas tu'. Confie na eleição de Deus.",
+    history: "Cuauhtlatoatzin ('Águia que fala'), batizado como Juan Diego, era um índio chichimeca simples e viúvo. Caminhava quilômetros para ir à missa e à catequese. Em 1531, a Virgem Maria apareceu-lhe no monte Tepeyac, chamando-o de 'meu filhinho mais pequeno'. Ele foi o mensageiro da Virgem ao Bispo, sofrendo incredulidade e humilhações. Como prova, levou em sua tilma (manto rústico de fibra de cacto) rosas castelhanas colhidas no inverno, e ao soltá-las, apareceu impressa a imagem milagrosa de Guadalupe, que desafia a ciência até hoje.",
+    reflection: "A escolha de Juan Diego pela Virgem Maria subverte todas as lógicas humanas de poder, influência e competência. Deus escolhe o que é fraco e desprezível aos olhos do mundo para confundir os fortes. Juan Diego tentou fugir da missão, sentindo-se indigno e incapaz ('sou apenas uma correia, um degrau, uma cauda'), mas Maria lhe confirmou: 'É preciso que sejas tu'. Isso nos ensina a confiar na eleição de Deus. Ele não nos chama porque somos capacitados, mas nos capacita porque nos chama. A santidade de Juan Diego floresceu na obediência simples, na tenacidade humilde e na confiança filial naquela que se apresentou como sua 'Mãe bondosa'.",
     prayer: "São Juan Diego, ensinai-nos a humildade que atrai o olhar de Maria.",
-    action: "Entregue uma preocupação a Maria: 'Não estou eu aqui, que sou tua mãe?'"
+    action: "Entregue uma preocupação a Maria dizendo: 'Não estou eu aqui, que sou tua mãe?'"
   },
   "10-12": {
     name: "Nossa Senhora de Loreto",
     title: "Memória",
-    history: "Celebra a Santa Casa de Nazaré. Lembra que a Encarnação aconteceu num lar, entre panelas e trabalho.",
-    reflection: "Deus santificou a vida doméstica. Nossa casa deve ser um 'Loreto' onde Jesus possa crescer. A santidade mora na rotina.",
-    prayer: "Nossa Senhora de Loreto, abençoai o nosso lar.",
-    action: "Abençoe sua casa com água benta ou reze em família."
+    history: "Esta festa celebra a Santa Casa de Nazaré. Segundo uma antiga tradição e recentes descobertas arqueológicas, as pedras da casa onde a Virgem recebeu o Anúncio e onde Jesus cresceu foram transportadas (pelos anjos ou pela família Angeli) de Nazaré para a Itália (Loreto) para serem salvas da destruição no fim das Cruzadas. Loreto é considerado o primeiro santuário internacional dedicado à Virgem.",
+    reflection: "A festa de Loreto nos recorda que Deus santificou a vida doméstica e o cotidiano aparentemente banal. Jesus não caiu do céu já adulto e glorioso; Ele cresceu em uma família, submisso a pais humanos, aprendendo uma profissão, vivendo entre panelas, vizinhos e trabalho manual. Isso significa que nossa casa, com suas alegrias, bagunças e tensões, é um lugar teológico, um lugar de encontro real com Deus. Não precisamos fugir da realidade para encontrar o Senhor; Ele está entre as panelas, na mesa do jantar, no cuidado com as crianças. Loreto nos convida a transformar nossos lares em santuários de amor, onde Jesus é o centro e o hóspede principal.",
+    prayer: "Nossa Senhora de Loreto, abençoai o nosso lar e santificai nossa rotina.",
+    action: "Abençoe sua casa com água benta ou reze uma oração em família na sala."
   },
   "11-12": {
     name: "São Dâmaso I",
     title: "Papa",
-    history: "Encomendou a tradução da Bíblia (Vulgata) e restaurou as catacumbas dos mártires para preservar a memória da fé.",
-    reflection: "Dâmaso nos ensina a amar a Bíblia e a honrar nossos antepassados na fé. Não somos cristãos sozinhos; somos herdeiros de uma história.",
-    prayer: "São Dâmaso, dai-nos amor pela Palavra de Deus.",
-    action: "Leia um trecho da Bíblia hoje."
+    history: "Papa do século IV que governou uma Igreja que saía das perseguições e entrava na era da liberdade. Homem culto e enérgico, ele percebeu o perigo de a Igreja perder suas raízes. Encomendou a seu secretário, São Jerônimo, a tradução da Bíblia para o latim (a Vulgata), garantindo que a Palavra fosse acessível. Trabalhou incansavelmente para restaurar as catacumbas, compondo epigramas (poemas) em honra aos mártires para que sua memória jamais fosse esquecida.",
+    reflection: "São Dâmaso tinha uma consciência aguda de que a Igreja é uma família que atravessa os séculos e que a memória é vital para a identidade cristã. Ao preservar as catacumbas, ele nos ensinou a não ter 'amnésia espiritual'. Nós não inventamos a fé; nós a recebemos de uma longa corrente de testemunhas que deram o sangue por Cristo. Dâmaso também nos lembra da centralidade da Escritura: 'ignorar as Escrituras é ignorar a Cristo', diria seu amigo Jerônimo. Ele nos convida a alicerçar nossa vida na Rocha da Palavra e na memória viva da Tradição. Um cristão sem raízes é derrubado por qualquer vento de doutrina.",
+    prayer: "São Dâmaso, dai-nos amor pela Palavra de Deus e reverência pelos nossos antepassados.",
+    action: "Leia um trecho da Bíblia hoje e medite sobre ele."
   },
   "12-12": {
     name: "Nossa Senhora de Guadalupe",
     title: "Padroeira da América",
-    history: "A Virgem mestiça que reconciliou povos no México. Apareceu grávida, trazendo Jesus para um novo continente.",
-    reflection: "Maria é a pedagoga do Evangelho. Ela evangeliza com ternura e beleza. Hoje, ela é o estandarte da defesa da vida contra a cultura da morte.",
-    prayer: "Virgem de Guadalupe, protegei a vida e as nossas famílias.",
-    action: "Reze uma Ave-Maria pelas crianças não nascidas."
+    history: "Em 1531, o México vivia a tensão sangrenta entre os conquistadores espanhóis e os nativos astecas, cuja religião e cultura haviam sido destruídas. A Virgem apareceu no monte Tepeyac não como uma europeia, mas como uma mestiça, vestida com símbolos astecas mas trazendo a cruz cristã. Ela falou em náuatle (língua nativa), apareceu grávida e se apresentou como a mãe do verdadeiro Deus. Sua aparição provocou a maior conversão em massa da história da Igreja: em poucos anos, 8 milhões de nativos pediram o batismo, pacificando um continente em guerra.",
+    reflection: "Maria em Guadalupe é a perfeita inculturadora do Evangelho. Ela não impõe a fé, ela a oferece com ternura materna, falando a linguagem do coração de seus filhos e assumindo suas feições. Ao aparecer grávida, ela se revela como a Arca da Nova Aliança, aquela que traz Jesus para um novo mundo. Hoje, Guadalupe é um estandarte poderoso na defesa da vida e da família. Diante da cultura da morte e do descarte, ela nos recorda a sacralidade de toda vida humana, desde o ventre até a velhice. Ela é a mãe que cura as feridas de orfandade de um continente inteiro, dizendo: 'Não tenhas medo, acaso não estou eu aqui?'.",
+    prayer: "Virgem de Guadalupe, protegei a vida, as nossas famílias e a nossa América.",
+    action: "Reze uma Ave-Maria pelas crianças não nascidas e pelas mães em dificuldade."
   },
   "13-12": {
     name: "Santa Luzia",
     title: "Virgem e Mártir",
-    history: "Preferiu perder os olhos a perder a fé. Padroeira da visão física e espiritual.",
-    reflection: "Luzia nos ensina a 'custódia dos olhos'. É preciso fechar os olhos para a vaidade para abri-los para Deus. A pureza nos dá clareza espiritual.",
+    history: "Jovem siciliana de Siracusa, Luzia consagrou secretamente sua virgindade a Deus. Quando sua mãe foi curada milagrosamente no túmulo de Santa Águeda, Luzia convenceu-a a distribuir o dote do seu casamento aos pobres. Seu noivo, furioso, denunciou-a como cristã. O governador tentou levá-la a um prostíbulo, mas o corpo de Luzia tornou-se tão pesado que nem bois conseguiram movê-la. Tentaram queimá-la, mas o fogo não a tocou. Por fim, foi degolada. A tradição diz que teve os olhos arrancados antes da morte, mas que Deus lhos restituiu ainda mais belos.",
+    reflection: "O nome Luzia evoca a luz (lux). Ela é invocada para proteger a visão física, mas sua vida nos aponta para uma visão mais profunda: a visão da fé. Luzia praticou a 'custódia dos olhos' num sentido radical, recusando-se a colocar seu olhar nas vaidades do mundo para mantê-lo fixo em Cristo, a Luz do Mundo. Ela nos ensina que a pureza de coração é a condição indispensável para 'ver a Deus'. Em um mundo saturado de imagens impuras, violência e distrações visuais, Santa Luzia nos convida a limpar nosso olhar, a fechar os olhos para o pecado para que possamos contemplar a beleza da santidade.",
     prayer: "Santa Luzia, conservai a luz dos meus olhos e a fé no meu coração.",
-    action: "Faça um jejum de telas (celular) hoje para limpar o olhar."
+    action: "Faça um jejum de telas (celular/TV) hoje para limpar o olhar e rezar mais."
   },
   "14-12": {
     name: "São João da Cruz",
     title: "Doutor Místico",
-    history: "Reformador do Carmelo. Na prisão escura, compôs seus mais belos poemas. Mestre da 'Noite Escura'.",
-    reflection: "A 'noite escura' não é abandono, é purificação. Deus nos desapega dos consolos para que amemos o Doador, não os dons. No nada, encontramos o Tudo.",
-    prayer: "Senhor, onde não houver amor, que eu coloque amor.",
-    action: "Aceite uma contrariedade hoje sem reclamar."
+    history: "Frade carmelita espanhol, co-reformador da Ordem com Santa Teresa de Ávila. Sua tentativa de levar a ordem de volta à austeridade original lhe custou caro: foi preso pelos próprios irmãos de hábito num armário minúsculo por nove meses, sofrendo fome e açoites. Foi nessa escuridão fétida e solitária que sua alma explodiu em luz, e ele compôs os mais belos poemas de amor a Deus da língua espanhola. Fugiu miraculosamente e tornou-se mestre espiritual, ensinando o caminho do 'Nada' para chegar ao 'Tudo' que é Deus.",
+    reflection: "São João da Cruz é o mestre do 'tudo ou nada'. Ele nos ensina que, para nos enchermos de Deus, precisamos nos esvaziar de nós mesmos e de nossos apegos desordenados. A famosa 'noite escura' que ele descreve não é um abandono de Deus, mas uma purificação necessária e amorosa: Deus nos retira os consolos sensíveis para que aprendamos a amar o Deus das consolações, e não as consolações de Deus. No silêncio e na cruz, João descobriu que 'quem ama não cansa nem se cansa'. Ele nos convida a buscar a união transformante com o Amado, onde a alma se torna chama de amor viva.",
+    prayer: "Senhor, onde não houver amor, que eu coloque amor. Ensinai-me a buscar-Vos no silêncio.",
+    action: "Aceite uma contrariedade ou sofrimento hoje sem reclamar, unindo-se à Cruz."
   },
   "15-12": {
     name: "Santa Maria de Rosa",
     title: "Fundadora",
-    history: "Dedicou a vida a cuidar dos doentes e feridos de guerra com ternura incansável.",
-    reflection: "O Advento exige a pressa da caridade. Preparar o Natal é cuidar do corpo ferido de Cristo nos irmãos.",
-    prayer: "Senhor, dai-nos mãos prontas para servir.",
-    action: "Visite um doente ou ajude alguém que sofre."
+    history: "Aristocrata de Bréscia, Itália, Maria de Rosa tinha saúde frágil, mas uma vontade de ferro. Desistiu de casamentos vantajosos para dedicar sua vida e fortuna a organizar o atendimento aos doentes no hospital da cidade. Durante as guerras de independência italiana e epidemias de cólera, ela e suas companheiras ('Servas da Caridade') iam aos campos de batalha buscar feridos, enfrentando soldados e riscos de contágio com uma coragem sobrenatural.",
+    reflection: "Estamos na metade do Advento, e Santa Maria de Rosa nos recorda que a espera cristã não é passiva, mas ativa. Preparar o Natal significa preparar o coração através da caridade concreta e corajosa. Ela via no corpo ferido e pestilento dos doentes a própria carne de Cristo precisando de cuidado. Sua vida nos questiona: nossa fé tem mãos? Ela se traduz em serviço ou fica apenas em sentimentos piedosos e teorias? A caridade é a única bagagem que levaremos desta vida para a eternidade. Quem serve ao irmão sofredor, está, na verdade, servindo e ninando o Rei que vai nascer.",
+    prayer: "Senhor, dai-nos mãos prontas para servir e um coração sensível à dor alheia.",
+    action: "Visite um doente, um idoso ou ajude concretamente alguém que sofre hoje."
   },
   "16-12": {
     name: "Santa Adelaide",
     title: "Imperatriz",
-    history: "Imperatriz que usou seu poder para construir a paz e ajudar a Igreja. Perdoou seus inimigos.",
-    reflection: "O poder é serviço. Adelaide mostra que é possível ser santo na política se o coração estiver em Deus. O perdão é a vingança do cristão.",
-    prayer: "Santa Adelaide, ajudai-nos a usar nossa influência para o bem.",
-    action: "Exerça sua liderança (em casa ou trabalho) com bondade."
+    history: "Uma das mulheres mais influentes do século X. Filha, esposa e mãe de reis, tornou-se a primeira imperatriz do Sacro Império Romano-Germânico. Sua vida foi um romance de fugas de prisões, casamentos políticos e intrigas de corte. Porém, usou seu imenso poder político para construir a paz, fundar mosteiros e socorrer os pobres. No fim da vida, foi regente de seu neto, governando com sabedoria, mas retirou-se para um mosteiro, morrendo em oração. Perdoou os inimigos que a haviam encarcerado.",
+    reflection: "Santa Adelaide desmonta o mito de que poder e santidade são incompatíveis. Ela nos mostra que o poder, quando visto como serviço e não como privilégio, pode ser um instrumento formidável de bem comum. Sua maior vitória, no entanto, não foi política, mas espiritual: a capacidade de perdoar aqueles que a perseguiram e humilharam. O perdão é a 'vingança' do cristão; é o que quebra a cadeia do ódio. Adelaide nos convida a exercer nossa liderança — seja na família, no trabalho ou na sociedade — com bondade, justiça e um coração desapegado das honras humanas.",
+    prayer: "Santa Adelaide, ajudai-nos a usar nossa influência para o bem e a perdoar nossos ofensores.",
+    action: "Exerça sua liderança (em casa ou trabalho) com bondade extra hoje."
   },
   "17-12": {
     name: "Início das Antífonas do Ó",
     title: "Liturgia do Advento",
-    history: "A Igreja canta os grandes títulos do Messias: Ó Sabedoria, Ó Adonai... Um clamor intenso pela vinda de Cristo.",
-    reflection: "O desejo é o fundo da oração. Quanto mais desejamos Deus, mais Ele vem. Peçamos a Sabedoria para ordenar nossa vida.",
-    prayer: "Ó Sabedoria, vinde ensinar-nos o caminho da prudência.",
-    action: "Reze pedindo luz para resolver um problema difícil."
+    history: "Nos últimos sete dias antes do Natal (17 a 23 de dez), a Liturgia da Igreja atinge seu ápice de expectativa. Nas Vésperas, cantam-se as sete 'Antífonas do Ó', clamando os títulos messiânicos de Jesus baseados em Isaías: Ó Sabedoria, Ó Adonai, Ó Raiz de Jessé, Ó Chave de Davi, Ó Sol Nascente, Ó Rei das Nações, Ó Emanuel. É um crescendo dramático de desejo: as iniciais latinas dos títulos, lidas de trás para frente, formam o acróstico 'ERO CRAS' ('Amanhã estarei lá').",
+    reflection: "Entramos na 'Semana Santa' do Natal. A liturgia se torna um grito de desejo: 'Vinde!'. Santo Agostinho dizia que 'o desejo é o fundo da oração' e que Deus dilata nosso coração através da espera para que Ele possa preenchê-lo mais plenamente. As Antífonas do Ó nos ensinam quem é Jesus: Ele não é apenas um bebê fofo; Ele é a Sabedoria que ordena o caos da nossa vida, a Chave que abre as prisões do nosso medo, o Sol que dissipa nossas trevas. Hoje, deixe que seu coração grite por Ele. Não se contente com um Natal superficial de luzes e presentes; deseje o Salvador com a intensidade de um náufrago que deseja a terra firme.",
+    prayer: "Ó Sabedoria, que saístes da boca do Altíssimo, vinde ensinar-nos o caminho da prudência.",
+    action: "Reze a antífona do dia pedindo luz para resolver um problema difícil."
   },
   "18-12": {
     name: "Nossa Senhora do Ó",
     title: "Expectação do Parto",
-    history: "Celebra a gravidez de Maria e sua expectativa serena pelo parto de Jesus.",
-    reflection: "Maria é o primeiro sacrário. Ela nos ensina a gestar Jesus no silêncio. A esperança cristã é a certeza de que Deus está chegando.",
-    prayer: "Ó Virgem da Esperança, preparai nosso coração para o Natal.",
-    action: "Faça silêncio imaginando-se à espera de Jesus com Maria."
+    history: "Uma festa antiga, de origem espanhola (Séc VII), que celebra a gravidez avançada de Maria. O título 'do Ó' refere-se tanto às antífonas cantadas nestes dias quanto ao suspiro de anseio da Virgem e da Igreja pelo nascimento do Redentor. A iconografia costuma mostrar Maria com o ventre proeminente, às vezes com uma pequena imagem de Jesus visível dentro dela, ou com a mão sobre o ventre em gesto de proteção e espera.",
+    reflection: "Nossa Senhora do Ó, ou da Expectação, é a imagem perfeita da esperança cristã. Maria é o primeiro sacrário da história; ela carrega o Infinito em seu ventre finito. Nestes dias finais, ela nos ensina a arte de 'gestar' Jesus. O barulho e a correria das compras de fim de ano tentam nos distrair e dispersar, mas Maria nos chama para o silêncio interior da gravidez. A esperança não é um otimismo ingênuo de que 'tudo vai dar certo', mas a certeza teológica de que Deus está chegando e que sua presença muda tudo. Prepare o berço do seu coração, pois o Hóspede divino está à porta.",
+    prayer: "Ó Virgem da Esperança, preparai nosso coração para receber o Natal com fé.",
+    action: "Faça 5 minutos de silêncio absoluto imaginando-se à espera de Jesus com Maria."
   },
   "19-12": {
     name: "Santo Urbano V",
     title: "Papa",
-    history: "Papa reformador e austero. Lutou contra o luxo e trabalhou pelo retorno da Igreja a Roma.",
-    reflection: "A reforma começa por nós. O que está 'exilado' em nossa vida e precisa voltar para o centro? A simplicidade é o caminho.",
-    prayer: "Senhor, reformai o meu coração.",
-    action: "Corte um luxo ou hábito supérfluo hoje."
+    history: "Guillaume de Grimoard era um monge beneditino austero e culto que foi eleito Papa em 1362. Encontrou a Igreja vivendo o 'Cativeiro de Avignon' (os papas moravam na França, sob influência do rei, e não em Roma). Urbano foi um reformador incansável: lutou contra o luxo da corte papal, combateu a simonia e trabalhou arduamente pelo retorno do Papado a Roma, sua sede natural e espiritual, apesar da resistência feroz dos cardeais franceses. Viveu como monge no trono de Pedro.",
+    reflection: "Santo Urbano V nos lembra que a Igreja, e cada cristão individualmente, precisa estar em constante reforma ('Ecclesia semper reformanda'). Mas a verdadeira reforma não começa mudando estruturas externas ou doutrinas, e sim convertendo o coração e voltando ao essencial. Urbano combateu o luxo e o conforto mundano para devolver à Igreja sua essência espiritual. Ele nos pergunta hoje: o que está 'exilado' em nossa vida? Talvez nossa oração esteja exilada na periferia do nosso dia, enquanto o entretenimento ocupa o centro. É tempo de trazer Deus de volta para o trono do nosso coração, vivendo com mais simplicidade.",
+    prayer: "Senhor, reformai o meu coração e reconduzi-me ao essencial.",
+    action: "Corte um luxo ou hábito supérfluo hoje em preparação para o Natal."
   },
   "20-12": {
     name: "São Domingos de Silos",
     title: "Abade",
-    history: "Libertador de cativos. Sua oração quebrava correntes. Padroeiro das gestações difíceis.",
-    reflection: "Cristo vem quebrar nossas correntes espirituais (vícios, medos). Não se acostume com a escravidão.",
-    prayer: "São Domingos, libertai-me das amarras do pecado.",
-    action: "Reze por alguém preso a um vício."
+    history: "Abade espanhol do século XI, reformador do mosteiro de Silos. Era famoso por sua caridade e poder de intercessão para libertar cristãos escravizados pelos mouros na Espanha ocupada. A tradição diz que sua oração era tão poderosa que as correntes dos cativos se rompiam milagrosamente. Muitas dessas correntes foram penduradas na igreja do mosteiro como ex-votos. É também patrono das gestantes, pois sua intercessão foi pedida pela mãe de São Domingos de Gusmão.",
+    reflection: "São Domingos é o santo da libertação. Hoje, talvez não existam correntes de ferro em nossos pulsos, mas carregamos correntes espirituais e psicológicas pesadíssimas: vícios (pornografia, álcool, jogos), rancores antigos que não soltamos, medos paralisantes, escravidão à opinião alheia. O Natal é a festa da liberdade: Deus se faz homem para que o homem não seja mais escravo do pecado. A intercessão de Domingos nos convida a apresentar a Cristo tudo o que nos amarra e nos impede de voar. Não se acostume com suas correntes; fomos criados para a liberdade gloriosa dos filhos de Deus.",
+    prayer: "São Domingos, libertai-me das amarras do pecado e do medo.",
+    action: "Identifique um vício ou apego e reze pedindo libertação específica."
   },
   "21-12": {
     name: "São Pedro Canísio",
     title: "Doutor da Igreja",
-    history: "O segundo apóstolo da Alemanha. Escreveu catecismos simples para o povo, combatendo a ignorância religiosa.",
-    reflection: "A fé precisa ser conhecida para ser amada. Canísio nos convida a estudar nossa religião para dar razão da nossa esperança.",
-    prayer: "São Pedro Canísio, dai-nos clareza na fé.",
-    action: "Explique o sentido do Natal para uma criança."
+    history: "Jesuíta holandês do século XVI, é considerado o segundo apóstolo da Alemanha. Encontrou o catolicismo alemão em ruínas devido à Reforma Protestante. Em vez de responder com ataques violentos, Canísio escolheu o caminho da caridade e da instrução. Viajou milhares de quilômetros a pé, fundou colégios e escreveu catecismos claros e acessíveis que fortaleceram a fé do povo por séculos. Dizia: 'Não se combate a heresia com a espada, mas com a oração e a boa doutrina'.",
+    reflection: "Num tempo de enorme confusão religiosa e relativismo, Pedro Canísio percebeu que o maior inimigo da fé não era a malícia, mas a ignorância. Ele entendeu que 'ninguém ama o que não conhece'. Sua vida é um chamado urgente ao estudo da nossa fé. Não podemos amar a Deus com uma fé infantil e superficial enquanto somos adultos em todas as outras ciências. O estudo do Catecismo, da Bíblia e da Doutrina não é intelectualismo árido, é um ato de amor e uma necessidade vital para 'dar razão da nossa esperança'. Precisamos de clareza para não sermos levados por qualquer vento de ideologia.",
+    prayer: "São Pedro Canísio, dai-nos clareza na fé e amor pela Verdade.",
+    action: "Leia um ponto do Catecismo ou explique o sentido do Natal para uma criança."
   },
   "22-12": {
     name: "Santa Francisca Cabrini",
     title: "Padroeira dos Imigrantes",
-    history: "Foi para os EUA cuidar dos imigrantes italianos. Mulher de fé vulcânica: 'Tudo posso naquele que me fortalece'.",
-    reflection: "Acolher o imigrante é acolher a Sagrada Família que também foi refugiada. A fé remove montanhas de dificuldades.",
-    prayer: "Santa Francisca, ensinai-nos a acolher o estrangeiro.",
-    action: "Reze por quem passará o Natal longe de casa."
+    history: "Pequena e frágil professora italiana que se tornou a primeira cidadã americana canonizada. Sonhava ser missionária na China, mas o Papa Leão XIII lhe disse: 'Não o Oriente, mas o Ocidente'. Ela cruzou o oceano para cuidar dos imigrantes italianos que viviam na miséria nos EUA. Com uma confiança vulcânica na Providência e um talento administrativo genial, fundou 67 instituições (escolas, hospitais, orfanatos) em 3 continentes, enfrentando preconceitos e falta de recursos.",
+    reflection: "Às portas do Natal, lembramos que a Sagrada Família também experimentou a rejeição ('não havia lugar para eles') e o exílio no Egito. Madre Cabrini via no rosto de cada imigrante desamparado o rosto do Menino Jesus. Ela repetia: 'Tudo posso naquele que me fortalece'. Ela nos ensina a audácia apostólica: quando Deus pede uma obra, Ele dá os meios, desde que tenhamos fé. Não devemos deixar que o medo ou a falta de recursos nos paralisem. Acolher o estrangeiro, o diferente, aquele que está longe de casa, é acolher o próprio Deus que 'veio para o que era seu, e os seus não o receberam'.",
+    prayer: "Santa Francisca, ensinai-nos a acolher o estrangeiro e a confiar na Providência.",
+    action: "Reze por quem passará o Natal longe de casa ou em situação de refúgio."
   },
   "23-12": {
     name: "São João Câncio",
     title: "Presbítero",
-    history: "Professor universitário polonês de extrema generosidade e honestidade. Deu até o manto aos ladrões.",
-    reflection: "Para abraçar o Menino Jesus, precisamos estar de mãos vazias. João Câncio nos ensina o desapego alegre e a verdade radical.",
-    prayer: "São João Câncio, fazei-nos generosos e verdadeiros.",
-    action: "Faça uma doação que lhe custe algum sacrifício."
+    history: "Professor de Teologia na Universidade de Cracóvia, Polônia. Era conhecido por seu intelecto brilhante, mas ainda mais por sua humildade e caridade extremas. Dormia no chão, comia pouco e dava tudo o que tinha aos pobres. Uma lenda famosa conta que, ao ser assaltado, entregou tudo o que tinha. Depois, lembrou-se de que tinha algumas moedas costuradas no manto. Correu atrás dos ladrões para entregar o resto, gritando que não queria ser mentiroso. Os ladrões, comovidos, devolveram tudo.",
+    reflection: "A honestidade e generosidade radicais de São João Câncio parecem loucura aos olhos do mundo calculista, mas são a sabedoria do Evangelho. Ele levava a sério o Sermão da Montanha. Sua vida nos prepara para o Natal através do desapego. Para abraçar o Menino Jesus, precisamos estar com as mãos vazias; mãos cheias de egoísmo, bens materiais ou orgulho não conseguem segurar Deus. João Câncio nos convida a uma generosidade que dói, que custa, mas que liberta. Ele nos lembra que a verdade deve ser sempre servida, custe o que custar, e que a caridade cobre uma multidão de pecados.",
+    prayer: "São João Câncio, fazei-nos generosos, verdadeiros e desapegados.",
+    action: "Faça uma doação ou gesto de caridade que lhe custe algum sacrifício real."
   },
   "24-12": {
     name: "Véspera de Natal",
     title: "Vigília do Natal",
-    history: "A noite santa. O Céu desce à terra. A Igreja vigia como os pastores.",
-    reflection: "Não deixe o barulho da festa abafar o mistério. Deus se faz pequeno. Prepare a gruta do seu coração.",
-    prayer: "Ó Menino Jesus, vinde depressa! Meu coração é vosso.",
-    action: "Reze diante do presépio antes da ceia."
+    history: "Esta é a noite mais santa da história humana, o ponto de virada do cosmos. O Céu desce à terra no silêncio de Belém. Em todo o mundo, a Igreja vigia em oração, unindo-se à expectativa de Maria e José e à simplicidade dos pastores nos campos, aguardando o anúncio do anjo: 'Nasceu para vós um Salvador'.",
+    reflection: "Chegamos à Noite Santa. O perigo hoje é que o aniversariante seja esquecido em sua própria festa, soterrado por presentes, comida e barulho. A liturgia nos pede uma atitude de vigília, de quem espera alguém importante. Deus não vem com estrondo de exércitos, Ele vem como um bebê, no silêncio e na fragilidade total. Ele não se impõe, Ele precisa ser acolhido. Olhe para o presépio: lá não há luxo, mas há muito amor. Faça do seu coração uma gruta de Belém: talvez seja pobre, frio e cheio de 'animais' (paixões), mas se você oferecer sua pobreza a Ele, Ele nascerá ali e tudo iluminará.",
+    prayer: "Ó Menino Jesus, vinde depressa! Meu coração é vosso, fazei nele vossa morada.",
+    action: "Reze diante do presépio em silêncio antes da ceia, colocando o Menino Jesus na manjedoura."
   },
   "25-12": {
     name: "Natal do Senhor",
     title: "Solenidade",
-    history: "O Verbo se fez carne. A humildade de Deus confunde a soberba humana.",
-    reflection: "Deus tem rosto humano. Ele assumiu nossa carne para redimi-la. Hoje não é dia de tristeza: o Salvador nasceu para nós!",
-    prayer: "Glória a Deus nas alturas e paz na terra!",
-    action: "Beije o Menino Jesus e perdoe seus familiares."
+    history: "O Verbo se fez carne e habitou entre nós. O Infinito tornou-se finito; o Eterno entrou no tempo; o Criador tornou-se criatura. Deus assumiu nossa humanidade inteira — exceto o pecado — para nos dar a Sua divindade. O nascimento de Jesus em Belém cumpre as profecias e inaugura a Redenção.",
+    reflection: "Hoje não é dia de tristeza, nem de medo, nem de solidão: hoje nasceu para nós um Salvador! O mistério da Encarnação é o escândalo do amor de Deus: Ele não quis nos salvar de longe, enviando um decreto ou um livro, mas veio pessoalmente, assumindo nossa carne, nosso suor, nossas lágrimas e nossa morte. Deus tem um rosto humano, um nome, uma história. Diante do Menino Jesus, toda soberba humana deve cair por terra. Se Deus se fez pequeno, como nós ousamos ser orgulhosos? Acolher o Natal é deixar que a ternura indefesa de Deus derreta o gelo do nosso coração e nos torne, também, portadores de paz para o mundo.",
+    prayer: "Glória a Deus nas alturas e paz na terra aos homens por Ele amados!",
+    action: "Beije o Menino Jesus com ternura e perdoe/abrace seus familiares."
   },
   "26-12": {
     name: "Santo Estêvão",
     title: "Protomártir",
-    history: "Primeiro mártir. Morreu perdoando seus assassinos e vendo os céus abertos.",
-    reflection: "O Natal traz a Cruz. Estêvão nos ensina que o perdão é o cume do amor. Quem perdoa, vence.",
-    prayer: "Santo Estêvão, ensinai-nos a perdoar de coração.",
-    action: "Reze por alguém que lhe ofendeu."
+    history: "Logo após o Natal, celebramos o primeiro mártir. Estêvão era um dos sete diáconos escolhidos para o serviço da caridade na Igreja primitiva. Cheio de graça e poder, fazia grandes milagres. Acusado falsamente de blasfêmia, fez um discurso inflamado recontando a história da salvação. Foi arrastado para fora da cidade e apedrejado. Morreu vendo os céus abertos e Jesus em pé à direita de Deus, e gritou: 'Senhor, não lhes imputes este pecado', imitando o perdão de Cristo na Cruz.",
+    reflection: "A liturgia coloca o sangue de Estêvão ao lado do berço de Jesus. Isso não é um erro; é uma lição de realismo. O Menino do presépio é o Homem da Cruz. Aceitar Jesus implica aceitar o testemunho da verdade, que muitas vezes incomoda o mundo e provoca perseguição. Estêvão nos ensina que o cume do amor cristão não é apenas dar coisas, mas dar a si mesmo, e o cume da fé é o perdão aos inimigos. Ele não morreu amaldiçoando, mas intercedendo. Seu perdão foi a semente da conversão de São Paulo, que guardava as roupas dos algozes. Quem perdoa, vence o mal com o bem.",
+    prayer: "Santo Estêvão, ensinai-nos a perdoar de coração e a testemunhar a verdade.",
+    action: "Reze especificamente por alguém que lhe ofendeu ou persegue."
   },
   "27-12": {
     name: "São João Evangelista",
     title: "Apóstolo",
-    history: "O discípulo amado. Reclinou a cabeça no peito de Jesus. Teólogo do Amor.",
-    reflection: "O cristianismo é intimidade com Jesus. João nos convida a ouvir as batidas do Coração de Deus.",
-    prayer: "São João, ajudai-nos a amar Jesus e Maria.",
-    action: "Leia o prólogo do Evangelho de João (Jo 1, 1-14)."
+    history: "Irmão de Tiago, pescador da Galileia, foi o 'Discípulo Amado'. O único apóstolo que não fugiu na hora da Cruz, permanecendo fiel ao lado de Maria. Foi o primeiro a correr para o túmulo vazio. Escreveu o quarto Evangelho, três cartas e o Apocalipse. Sua teologia voa alto como uma águia, contemplando o Verbo Eterno. Morreu velhinho em Éfeso, repetindo sempre: 'Meus filhinhos, amai-vos uns aos outros'.",
+    reflection: "São João é o modelo da intimidade profunda com Cristo. Na Última Ceia, ele teve o privilégio de reclinar a cabeça sobre o peito do Mestre, ouvindo as batidas do Seu Coração Sagrado. O cristianismo não é um conjunto de regras, é essa relação pessoal, esse 'coração a coração' com Deus. João nos ensina que a teologia nasce do amor e da oração, não apenas do estudo. Ele também nos recebeu como filhos aos pés da Cruz, quando Jesus lhe entregou Maria ('Eis a tua mãe'). Ser discípulo amado é acolher Maria em nossa casa (em nossa vida interior) e viver fundado no amor fraterno.",
+    prayer: "São João, ajudai-nos a amar Jesus e Maria e a penetrar nos mistérios de Deus.",
+    action: "Leia o prólogo do Evangelho de João (Jo 1, 1-14) em oração."
   },
   "28-12": {
     name: "Santos Inocentes",
     title: "Mártires",
-    history: "As crianças mortas por Herodes em lugar de Cristo.",
-    reflection: "Deus não é indiferente à dor dos inocentes. Defendamos a vida desde a concepção contra os novos Herodes.",
-    prayer: "Ó Santos Inocentes, intercedei pelas crianças.",
-    action: "Faça uma oferta para uma obra que cuida de crianças."
+    history: "As crianças de Belém e arredores, com menos de dois anos, que foram arrancadas dos braços de suas mães e trucidadas pela ordem paranoica do rei Herodes. Herodes, temendo perder seu trono para o 'Rei dos Judeus' recém-nascido, tentou matar Jesus eliminando toda uma geração de bebês.",
+    reflection: "Os Santos Inocentes são mártires que não falaram, não pregaram, mas morreram por Cristo e no lugar de Cristo. Sua festa nos confronta com o mistério terrível do mal e do sofrimento inocente. Deus não é indiferente a esse sangue; Ele o recolhe e glorifica. Hoje, este grito ecoa nos milhões de inocentes não nascidos vítimas do aborto, nas crianças vítimas de guerras e abusos. Herodes representa o poder que teme que Deus limite sua liberdade e controle. Mas Cristo não vem para tirar nada, a não ser o pecado. Defendamos a vida com coragem, sendo voz dos que não têm voz.",
+    prayer: "Ó Santos Inocentes, intercedei pelas crianças e pelo fim da cultura da morte.",
+    action: "Faça uma oferta para uma obra pró-vida ou que cuida de crianças carentes."
   },
   "29-12": {
     name: "São Tomás Becket",
     title: "Bispo e Mártir",
-    history: "Bispo inglês que defendeu a liberdade da Igreja contra o Rei. Foi morto na catedral.",
-    reflection: "Não negocie sua consciência por amizades poderosas. A liberdade da fé vale o sangue.",
-    prayer: "São Tomás, dai-nos coragem para defender a Igreja.",
-    action: "Reze pela liberdade religiosa."
+    history: "Chanceler da Inglaterra e amigo íntimo de farras e política do rei Henrique II. O rei o nomeou Arcebispo de Cantuária esperando ter um aliado para controlar a Igreja. Mas Tomás converteu-se radicalmente: trocou as roupas finas pelo cilício, a festa pela oração, e tornou-se um defensor intransigente da liberdade da Igreja contra a tirania real. Furioso, o rei desejou sua morte. Quatro cavaleiros invadiram a catedral e assassinaram Tomás durante as Vésperas. Ele morreu dizendo: 'Pelo nome de Jesus e pela defesa da Igreja, estou pronto a abraçar a morte'.",
+    reflection: "A história de Becket é o drama da consciência e da conversão. Ele teve que escolher entre a amizade do rei (e todo o poder do mundo) e a fidelidade a Deus. O mundo nos pressiona a sermos 'politicamente corretos', a fazermos concessões morais para manter nossa posição ou popularidade. Tomás nos ensina que a paz a qualquer preço não é paz, é covardia. Há momentos em que o cristão deve dizer 'não' ao mundo para poder dizer 'sim' a Deus. Sua morte na catedral nos lembra que o lugar mais seguro não é onde o corpo está protegido, mas onde a alma está na graça de Deus.",
+    prayer: "São Tomás, dai-nos coragem para defender a Igreja e seguir nossa consciência.",
+    action: "Reze pela liberdade religiosa e pelos cristãos perseguidos."
   },
   "30-12": {
     name: "Sagrada Família",
     title: "Festa",
-    history: "Jesus, Maria e José: a escola do amor humano e divino.",
-    reflection: "A família é o lugar onde se aprende a ser gente. Que nossos lares sejam Nazarés de oração e trabalho.",
-    prayer: "Jesus, Maria e José, nossa família vossa é.",
-    action: "Faça um momento de oração em família."
+    history: "Celebração de Jesus, Maria e José em Nazaré. Não é apenas uma devoção piedosa, mas a contemplação do modo como Deus quis entrar no mundo: numa família. Jesus passou 30 anos obedecendo a José e Maria, trabalhando como carpinteiro, vivendo uma vida normal aos olhos dos vizinhos, santificando as relações humanas.",
+    reflection: "Hoje olhamos para a 'Trindade na Terra'. A Sagrada Família não era uma família de comercial de margarina, isenta de problemas; eles conheceram a pobreza, a perseguição de Herodes, o exílio no Egito e a angústia de perder o Filho no templo. O que os unia não era a ausência de dificuldades, mas a presença de Deus no centro de tudo. Eles nos ensinam que a família é a 'escola do mais rico humanismo', o lugar onde aprendemos a amar, a perdoar, a servir e a rezar. Que nossos lares sejam pequenos 'Nazarés', onde o trabalho é oração, onde a TV não abafa o diálogo e onde o amor se prova nos pequenos detalhes.",
+    prayer: "Jesus, Maria e José, nossa família vossa é. Fazei do nosso lar um cenáculo de amor.",
+    action: "Faça um momento de oração em família e renove as promessas do lar."
   },
   "31-12": {
     name: "São Silvestre",
     title: "Papa",
-    history: "Papa da paz de Constantino. Construiu as grandes basílicas.",
-    reflection: "Fim de ano. Tudo passa, só Deus permanece. Agradeça por tudo, as alegrias e as cruzes.",
-    prayer: "Senhor, obrigado por este ano. A Vós a glória.",
-    action: "Reze o Te Deum em agradecimento."
+    history: "Papa que governou a Igreja numa época decisiva: a transição das catacumbas para a liberdade. Ele viu o imperador Constantino dar liberdade de culto aos cristãos (Edito de Milão). Silvestre organizou a vida pública da Igreja, enviou legados ao Concílio de Niceia (que definiu o Credo) e construiu as primeiras grandes basílicas de Roma (São João de Latrão, São Pedro). Foi um construtor da paz e da unidade.",
+    reflection: "No último dia do ano, celebramos o Papa que viu o fim de uma era de trevas e o início de um tempo de paz. Isso é simbólico. Diante do ano que termina, somos chamados a fazer um balanço espiritual. Tudo passa: impérios caem, dores passam, sucessos desvanecem. 'Só Deus basta', dizia Santa Teresa. São Silvestre nos convida a agradecer pelo dom do tempo e a entregar o passado à misericórdia de Deus e o futuro à Sua providência. Que este fim de ano não seja apenas festa pagã, mas um ato de adoração Àquele que é o Senhor do Tempo e da História. Te Deum laudamus!",
+    prayer: "Senhor, obrigado por este ano. A Vós a glória pelos séculos dos séculos.",
+    action: "Reze o 'Te Deum' em agradecimento pelo ano que passou."
   },
 
   // === JANEIRO 2026 ===
   "1-1": {
     name: "Santa Maria, Mãe de Deus",
     title: "Solenidade",
-    history: "Celebramos o dogma da Theotokos (Mãe de Deus). Maria guardava tudo no coração.",
-    reflection: "Inicie o ano na escola de Maria: a arte da interioridade. Não viva na superfície, mas na profundidade da fé.",
-    prayer: "Santa Mãe de Deus, guardai nosso ano.",
-    action: "Consagre seu ano a Nossa Senhora."
+    history: "A Igreja inicia o ano civil celebrando o maior título de Maria: Theotokos (Mãe de Deus). Definido no Concílio de Éfeso (431), este dogma afirma que Maria não é mãe apenas do corpo de Jesus, mas da Pessoa Divina do Verbo que assumiu a carne. O ventre de Maria tornou-se o lugar onde Deus e o homem se uniram para sempre.",
+    reflection: "Começamos o ano no colo da Mãe; não há lugar mais seguro para enfrentar o futuro. O Evangelho do dia diz que 'Maria guardava todas estas coisas, meditando-as no seu coração'. Diante de um ano novo, cheio de incertezas, guerras e promessas, Maria nos ensina a arte da interioridade. Não viva na superfície, arrastado pelos eventos ou pelas notícias; aprenda a 'guardar' a vida no coração, a ler os sinais de Deus em cada acontecimento, seja alegre ou triste. Ela é a Rainha da Paz que imploramos para o mundo dilacerado. Consagrar o ano a Ela é garantir que, aconteça o que acontecer, nunca estaremos órfãos.",
+    prayer: "Santa Mãe de Deus, guardai nosso ano sob o vosso manto sagrado.",
+    action: "Consagre seu ano e seus projetos a Nossa Senhora."
   },
   "2-1": {
     name: "São Basílio Magno",
     title: "Bispo e Doutor",
-    history: "Grande teólogo e pai dos pobres. Uniu doutrina e caridade.",
-    reflection: "O pão que sobra em sua mesa pertence ao faminto. A fé sem obras é morta.",
-    prayer: "São Basílio, dai-nos amor aos pobres.",
-    action: "Doe algo hoje."
+    history: "Um dos Grandes Padres da Igreja do Oriente. Gigante intelectual que defendeu a divindade do Espírito Santo contra heresias. Mas não ficou nos livros: organizou a 'Basiliade', uma verdadeira cidade da caridade com hospitais, orfanatos e oficinas para os pobres. Uniu como poucos a teologia mais sublime à caridade mais concreta. Foi também o pai do monaquismo oriental, escrevendo regras que organizaram a vida dos monges.",
+    reflection: "São Basílio derruba a falsa dicotomia entre fé e obras, ou entre teologia e social. Para ele, o verdadeiro conhecimento de Deus leva inevitavelmente ao serviço ao próximo. Ele dizia palavras de fogo que queimam nossa consciência: 'O pão que guardas em tua despensa pertence ao faminto; a roupa que escondes no armário pertence ao nu; o dinheiro que enterras pertence ao miserável'. Sua vida nos desafia a uma caridade que não seja apenas esmola ocasional, mas justiça, partilha e estrutura. Não podemos adorar a Deus no altar e desprezá-Lo no pobre. A fé cristã deve ser fermento de fraternidade.",
+    prayer: "São Basílio, dai-nos amor aos pobres e zelo pela verdade.",
+    action: "Doe algo hoje (roupa, comida ou dinheiro) desapegando-se de verdade."
   },
   "3-1": {
     name: "Santíssimo Nome de Jesus",
     title: "Memória",
-    history: "O nome que salva. Ao seu nome todo joelho se dobra.",
-    reflection: "O Nome de Jesus tem poder contra o mal. Use-o como oração constante.",
-    prayer: "Jesus, sede minha força.",
-    action: "Invoque o Nome de Jesus com amor."
+    history: "Festa que honra o Nome que está acima de todo nome. O nome 'Yeshua' foi dado pelo próprio Céu (pelo anjo a José e Maria) e significa 'Deus salva'. São Paulo diz que 'ao nome de Jesus, todo joelho se dobre'. Santos como São Bernardino de Sena percorriam a Itália segurando o trigrama IHS, pregando que este Nome tem poder real de expulsar o mal e curar.",
+    reflection: "O Nome de Jesus não é apenas um rótulo ou uma palavra; é uma presença real, uma pessoa. O Catecismo ensina que rezar o Nome de Jesus é a maneira mais simples de rezar sempre. Pronunciar este Nome com fé é uma oração poderosíssima que afugenta os demônios, acalma as tempestades do coração e atrai a graça do Espírito Santo. Muitas vezes buscamos orações complicadas, quando temos o tesouro do Nome de Jesus em nossos lábios. Que este Nome seja nossa respiração constante neste ano. Quando estiver em perigo, diga: 'Jesus'. Quando estiver feliz, diga: 'Jesus'. Que tudo o que fizermos seja selado por este Nome Santo.",
+    prayer: "Jesus, Filho de Davi, tende piedade de mim. Jesus, sede minha força.",
+    action: "Invoque o Nome de Jesus com amor e reverência várias vezes ao dia."
   },
   "4-1": {
     name: "Santa Ângela de Foligno",
     title: "Mística",
-    history: "Encontrou Deus após perder tudo. Mestra da oração.",
-    reflection: "A dor pode ser lugar de encontro com o Amor. Nada está perdido em Deus.",
-    prayer: "Santa Ângela, ensinai-nos a amar a cruz.",
-    action: "Ofereça um sacrifício."
+    history: "Nascida na riqueza, Ângela viveu grande parte da vida imersa na vaidade, no orgulho e nos prazeres mundanos. Era casada e tinha filhos, mas vivia superficialmente. Após uma série de tragédias (perda do marido e filhos em pouco tempo) e uma crise de consciência, converteu-se radicalmente. Despojou-se de tudo e mergulhou no abismo do amor divino e da meditação da Paixão de Cristo. Tornou-se uma das maiores místicas da Igreja, ditando suas experiências de união com Deus.",
+    reflection: "A vida de Santa Ângela é um testemunho de que nenhum abismo de futilidade é fundo demais para a misericórdia de Deus. Ela encontrou Deus não na prosperidade, mas no despojo total e na dor. Ela nos ensina que, às vezes, Deus permite que percamos as seguranças humanas para descobrirmos que Ele é a única segurança verdadeira e o único Amor que não morre. Sua mística não é alienada, mas centrada no 'Deus-Homem sofredor'. Ela nos convida a não ter medo da cruz e do sofrimento, pois é neles que a alma se une mais intimamente ao seu Amado. A verdadeira oração transforma a dor em amor.",
+    prayer: "Santa Ângela, ensinai-nos a encontrar Jesus na cruz e a amá-Lo sobre tudo.",
+    action: "Ofereça um pequeno sacrifício ou dor em reparação pelos pecados."
   },
   "5-1": {
     name: "São João Neumann",
     title: "Bispo",
-    history: "Missionário incansável, organizou as escolas católicas nos EUA.",
-    reflection: "A santidade floresce no serviço simples e na educação da fé.",
-    prayer: "Senhor, ajudai-nos a servir.",
-    action: "Ajude alguém a aprender algo."
+    history: "Imigrante da Boêmia que foi para os EUA com um dólar no bolso e o sonho de ser missionário. Tornou-se padre redentorista e depois Bispo da Filadélfia. Era um homem pequeno e humilde, mas de uma atividade pastoral vulcânica. Percebendo que as crianças imigrantes estavam perdendo a fé nas escolas públicas protestantes, organizou o primeiro sistema diocesano de escolas católicas nos EUA. Aprendeu inúmeras línguas para confessar os imigrantes. Morreu subitamente na rua, de exaustão, servindo até o fim.",
+    reflection: "São João Neumann entendeu que o futuro da Igreja e da sociedade dependia da educação. 'Se não ensinarmos a fé às crianças, perderemos a fé dos adultos'. Sua vida de trabalho incansável e simples nos mostra que a santidade não exige palcos, mas fidelidade no dever cotidiano cumprido com amor extraordinário. Ele nos convida a investir na formação das novas gerações, a sermos catequistas em nossas casas e a valorizarmos o tesouro da doutrina católica. Num mundo que deseduca, a família e a Igreja devem ser faróis da Verdade.",
+    prayer: "Senhor, ajudai-nos a servir com humildade e a educar na fé.",
+    action: "Ajude alguém a aprender algo útil ou ensine uma oração a uma criança."
   },
   "6-1": {
     name: "Epifania do Senhor",
     title: "Solenidade",
-    history: "Deus se revela a todos os povos nos Reis Magos.",
-    reflection: "A fé é um êxodo: sair do conforto para seguir a estrela. Adore o Deus humilde.",
-    prayer: "Luz das nações, guiai-nos.",
-    action: "Renove sua esperança olhando para o céu."
+    history: "A palavra 'Epifania' significa manifestação. Celebramos a revelação de Jesus não apenas a Israel, mas a todos os povos da terra, representados pelos Reis Magos do Oriente. Guiados por uma estrela e pelas profecias, estes sábios pagãos empreenderam uma longa e perigosa jornada para adorar o Menino. Ofereceram presentes proféticos: ouro (Rei), incenso (Deus) e mirra (Homem mortal).",
+    reflection: "A Epifania é a festa da 'busca de Deus'. Os Magos eram homens inquietos, não satisfeitos com seus saberes humanos e confortos; eles buscavam mais, olhavam para o céu e liam os sinais. A fé exige essa santa inquietação, essa disposição de sair da zona de conforto (física ou mental) e empreender uma jornada em busca da Verdade. Eles nos ensinam a não chegar diante de Deus de mãos vazias, mas oferecendo o melhor de nós: o ouro da nossa liberdade e amor, o incenso da nossa oração e a mirra dos nossos sofrimentos. E, o mais importante: após encontrar Jesus, 'voltaram por outro caminho'. O encontro real com Deus muda a rota da nossa vida para sempre.",
+    prayer: "Luz das nações, guiai-nos até Vós e fazei-nos vossas estrelas para os outros.",
+    action: "Renove sua esperança e ofereça seu 'ouro' (algo valioso) a Deus hoje."
   },
   "7-1": {
     name: "São Raimundo de Penafort",
     title: "Presbítero",
-    history: "Mestre do Direito Canônico e da misericórdia. Resgatou cativos.",
-    reflection: "A lei deve servir à caridade. Seja justo e compassivo.",
-    prayer: "São Raimundo, fazei-nos misericordiosos.",
-    action: "Seja justo em seus julgamentos."
+    history: "Dominicano espanhol de vasta cultura, foi um brilhante jurista que compilou as Decretais (leis) da Igreja a pedido do Papa, dando forma ao Direito Canônico. Mas não era um burocrata frio: dedicou-se apaixonadamente à evangelização dos mouros e judeus e ao resgate de cativos. Foi confessor de reis e papas. Um milagre famoso conta que, proibido pelo rei de sair da ilha de Maiorca por criticar a vida imoral do monarca, Raimundo estendeu sua capa sobre o mar, ergueu uma ponta como vela com seu bastão e navegou milagrosamente até Barcelona.",
+    reflection: "Muitas vezes opomos a lei ao amor, mas São Raimundo nos mostra que a lei, na Igreja, existe para servir a 'salus animarum' (a salvação das almas), que é a lei suprema. Ele era um homem de rigor intelectual, mas de coração compassivo. O episódio da capa sobre o mar simboliza que a santidade e a confiança em Deus superam as barreiras humanas e as tiranias dos poderosos. Ele nos ensina a ser justos sem sermos rígidos, e misericordiosos sem sermos permissivos. A ordem, a disciplina e o estudo são trilhos por onde o trem do amor viaja com segurança e eficácia.",
+    prayer: "São Raimundo, fazei-nos justos, sábios e misericordiosos.",
+    action: "Seja justo em seus julgamentos e cumpra bem seus deveres hoje."
   },
   "8-1": {
     name: "São Severino",
     title: "Abade",
-    history: "Apóstolo da Áustria que trouxe ordem e caridade em tempos de caos.",
-    reflection: "A santidade estabiliza o mundo. Seja um ponto de paz.",
-    prayer: "Dai-nos a paz, Senhor.",
-    action: "Promova a paz em seu ambiente."
+    history: "Um homem misterioso que apareceu na província de Nórica (atual Áustria) no século V, durante o colapso aterrorizante do Império Romano sob as invasões bárbaras. Ninguém sabia sua origem. Ele vivia em extrema penitência, andava descalço na neve, mas era um pilar de estabilidade social. Alimentava os famintos, negociava tratados de paz com os chefes bárbaros, resgatava prisioneiros e organizava a vida das cidades em ruínas. Previu a destruição de cidades que não se converteram.",
+    reflection: "Vivemos tempos que, às vezes, parecem o fim de uma era, com incertezas, guerras e crises morais. São Severino é o santo perfeito para tempos de crise e colapso. Ele não fugiu do mundo para se salvar sozinho, nem se desesperou. Pelo contrário, sua santidade tornou-se um refúgio para todos. Ele nos mostra que o santo é aquele que estabiliza o mundo ao seu redor porque está ancorado no Eterno. Quando tudo treme, quem está em Deus permanece firme e pode oferecer abrigo aos outros. A caridade organiza o caos.",
+    prayer: "Senhor, dai-nos a paz e fazei-nos construtores da civilização do amor.",
+    action: "Seja um ponto de paz e esperança em seu ambiente de trabalho ou família."
   },
   "9-1": {
     name: "Santo Adriano",
     title: "Abade",
-    history: "Africano que evangelizou a Inglaterra. Uniu culturas pela fé.",
-    reflection: "A Igreja é universal. Construa pontes, não muros.",
-    prayer: "Santo Adriano, ajudai-nos a unir.",
-    action: "Dialogue com quem pensa diferente."
+    history: "Nascido na África do Norte (atual Líbia), Adriano era um erudito que foi enviado pelo Papa para a Inglaterra junto com um monge grego, São Teodoro. Juntos, esse africano e esse grego lideraram a Igreja na Inglaterra anglo-saxônica. Adriano tornou-se abade de Cantuária e transformou o mosteiro num centro de cultura, ensinando grego, latim, teologia e ciências romanas, atraindo estudantes de toda a ilha.",
+    reflection: "Santo Adriano é um ícone vivo da catolicidade (universalidade) da Igreja. Um africano e um grego guiando a Igreja na Inglaterra do século VII mostra que, em Cristo, não há fronteiras, não há judeu nem grego, nem escravo nem livre. A fé derruba as barreiras de raça, cultura e nacionalidade. Adriano foi um grande educador e construtor de pontes culturais. Ele nos convida a superar nossos preconceitos e paroquialismos. A Igreja é a casa de todos os povos. Sua vida nos desafia a ver a riqueza da diversidade na unidade da mesma fé e a valorizar a cultura como caminho de evangelização.",
+    prayer: "Santo Adriano, ajudai-nos a unir os povos na mesma fé.",
+    action: "Dialogue com respeito com alguém que pensa diferente de você."
   },
   "10-1": {
     name: "São Gonçalo de Amarante",
     title: "Presbítero",
-    history: "Santo violeiro que construiu pontes para o povo.",
-    reflection: "Alegria e serviço andam juntos. Una as pessoas.",
-    prayer: "São Gonçalo, ensinai-nos a alegria.",
-    action: "Reconcilie duas pessoas."
+    history: "Santo português do século XIII, imensamente popular. Após peregrinar a Roma e Jerusalém, tornou-se eremita e depois dominicano. Era um pregador incansável que desejava converter os pecadores. A tradição conta que, vendo a dificuldade do povo para atravessar o rio Tâmega, decidiu construir uma ponte com as próprias mãos e com esmolas que pedia. Diz-se também que tocava viola e cantava para atrair o povo e depois pregar-lhes o Evangelho, unindo alegria e fé.",
+    reflection: "São Gonçalo quebra o estereótipo do santo triste, carrancudo ou distante da realidade. Ele usava a música, a alegria e o trabalho braçal de engenharia para chegar ao coração do povo e servir. Construir pontes é uma bela definição de santidade: ligar as margens, ligar os homens entre si e ligar os homens a Deus. Ele nos ensina que a evangelização não precisa ser chata; a alegria cristã é uma isca poderosa para pescar almas. Sejamos construtores de pontes em nossas famílias divididas e em nossa sociedade polarizada, facilitando o encontro e o perdão.",
+    prayer: "São Gonçalo, ensinai-nos a alegria de servir e construir pontes.",
+    action: "Tente reconciliar duas pessoas ou facilitar a vida de alguém hoje."
   },
   "11-1": {
     name: "Santo Higino",
     title: "Papa",
-    history: "Organizou a Igreja e o batismo em tempos difíceis.",
-    reflection: "A ordem serve à vida. Valorize a estrutura da fé.",
-    prayer: "Senhor, protegei a Igreja.",
-    action: "Reze pelo Papa."
+    history: "Papa grego do século II (o 9º sucessor de Pedro). Governou a Igreja num período turbulento de perseguições externas e, pior, de heresias internas (gnosticismo) que ameaçavam diluir a fé. Higino teve que estruturar a hierarquia (clero) e instituir a figura dos padrinhos no Batismo, para garantir que os novos cristãos tivessem um guia experiente e não abandonassem a fé diante do perigo de morte.",
+    reflection: "Santo Higino viveu num tempo em que ser cristão era risco de morte. Ele entendeu que a fé não sobrevive sozinha no isolamento; ela precisa de uma estrutura, de uma comunidade, de 'padrinhos' e pastores que guiem e protejam os fiéis. A instituição do apadrinhamento nos lembra que somos responsáveis pela fé uns dos outros. Ninguém vai para o céu sozinho. Higino nos convida a valorizar a ordem, a hierarquia e a tradição da Igreja não como burocracia humana, mas como a estrutura óssea que sustenta e protege o Corpo vivo de Cristo.",
+    prayer: "Senhor, protegei a vossa Igreja e dai-nos amor pela nossa comunidade.",
+    action: "Reze pelo Papa e pelos seus padrinhos de batismo."
   },
   "12-1": {
     name: "São Bento Biscop",
     title: "Abade",
-    history: "Trouxe beleza, livros e arte para evangelizar.",
-    reflection: "A beleza leva a Deus. Busque o que é nobre.",
-    prayer: "Deus de beleza, iluminai-nos.",
-    action: "Leia algo edificante."
+    history: "Nobre anglo-saxão que se fez monge. Apaixonado pela liturgia romana e pela beleza, viajou cinco vezes a Roma (uma viagem perigosíssima na época) para trazer para a Inglaterra não ouro, mas livros, relíquias, pinturas, vidros coloridos e mestres de canto gregoriano. Fundou mosteiros que se tornaram faróis de civilização e educou São Beda, o Venerável. Ele acreditava que a beleza da liturgia era a porta do céu.",
+    reflection: "Bento Biscop sabia que 'a beleza salvará o mundo'. Ele não queria apenas monges que rezassem, mas que rezassem rodeados de beleza, cultura e arte, pois o belo sensível eleva a alma ao Belo Eterno. Ele construiu bibliotecas num tempo de barbárie. Ele nos ensina que o cristianismo é uma religião de cultura, que valoriza a inteligência e a estética como reflexos de Deus. Num mundo feio, utilitarista e vulgar, somos chamados a cultivar a beleza na liturgia, em nossas casas e em nossa vida, pois a feiura deprime a alma, mas a beleza a expande para Deus.",
+    prayer: "Deus de toda beleza, iluminai nossa mente e elevai nosso coração.",
+    action: "Leia algo edificante ou escute uma música sacra hoje, cultivando a beleza."
   },
   "13-1": {
     name: "Santo Hilário",
     title: "Doutor",
-    history: "Defendeu a divindade de Cristo com coragem.",
-    reflection: "Não negocie a verdade. A felicidade é conhecer a Deus.",
-    prayer: "Santo Hilário, dai-nos firmeza.",
-    action: "Defenda sua fé com caridade."
+    history: "Bispo de Poitiers, França, no século IV. Chamado de 'Atanásio do Ocidente', foi um gigante na luta contra a heresia ariana, que negava a divindade de Cristo e que havia seduzido quase todo o império, inclusive bispos e imperadores. Hilário foi exilado para o Oriente por defender que Jesus é Deus. Aproveitou o exílio para estudar a teologia grega e escreveu 'A Trindade', obra prima teológica. Dizia: 'Não me calarei, não descansarei, enquanto a verdade de Deus for atacada'.",
+    reflection: "Santo Hilário nos mostra que a verdade não é uma opinião negociável, é uma Pessoa: Jesus Cristo, verdadeiro Deus e verdadeiro homem. Negociar a divindade de Cristo seria esvaziar a nossa salvação, pois só Deus pode nos salvar. Hilário foi manso com as pessoas, mas intransigente com o erro. Ele nos ensina a virtude da fortaleza e a coragem da confissão. Muitas vezes, o mundo quer um cristianismo 'light', sem dogmas, reduzido a uma ética social. Hilário nos recorda que nossa alegria depende da Verdade. Não tenhamos medo de ser minoria quando estamos com a Verdade.",
+    prayer: "Santo Hilário, dai-nos firmeza na fé e coragem para defender a Verdade.",
+    action: "Estude um pouco sobre o Credo ou defenda sua fé com caridade se surgir a ocasião."
   },
   "14-1": {
     name: "São Félix de Nola",
     title: "Confessor",
-    history: "Protegido por uma teia de aranha. Viveu na pobreza feliz.",
-    reflection: "Confie na Providência nos detalhes. Deus cuida.",
-    prayer: "Senhor, em Vós confio.",
-    action: "Entregue uma preocupação a Deus."
+    history: "Presbítero italiano do século III. Durante a perseguição, foi preso e torturado, mas libertado milagrosamente por um anjo para socorrer seu bispo doente. Fugindo dos soldados, escondeu-se numa fenda de muro. Imediatamente, uma aranha teceu uma teia densa na entrada. Os soldados, vendo a teia intacta, passaram direto, achando que ninguém poderia ter entrado ali. Com o fim da perseguição, recusou reaver seus bens confiscados e viveu pobre, cultivando um jardim e servindo ao próximo.",
+    reflection: "A vida de São Félix é uma aventura da Divina Providência. O episódio da aranha nos ensina que, para quem ama a Deus, até o menor inseto pode ser instrumento de salvação. 'Onde Deus está, uma teia de aranha é uma muralha; onde Deus não está, uma muralha é uma teia de aranha', dizia Paulino de Nola sobre ele. Félix é o santo da confiança absoluta e da simplicidade. Por que nos preocupamos e ansiamos tanto? Se Deus cuida dos lírios do campo e usou uma aranha para salvar seu servo, não cuidará de nós? Félix nos convida a abandonar o controle e a descansar nos braços do Pai.",
+    prayer: "Senhor, em Vós confio; cuidai de mim nos detalhes.",
+    action: "Entregue uma preocupação específica a Deus e não pense mais nela hoje."
   },
   "15-1": {
     name: "Santo Amaro",
     title: "Abade",
-    history: "Andou sobre as águas por obediência.",
-    reflection: "A obediência opera milagres. Ouça a Deus prontamente.",
-    prayer: "Santo Amaro, dai-nos obediência.",
-    action: "Obedeça a um bom dever sem demora."
+    history: "Jovem nobre romano entregue pelos pais a São Bento para ser educado em Subiaco. Tornou-se o discípulo predileto do patriarca. É famoso pelo milagre da obediência: ao ouvir São Bento mandar socorrer o menino Plácido que estava se afogando no lago, Amaro correu tão focado na ordem recebida que andou sobre as águas sem perceber, salvou o menino e voltou. Bento atribuiu o milagre à obediência de Amaro; Amaro, à ordem de Bento. Foi enviado para fundar o monaquismo beneditino na França.",
+    reflection: "O milagre de Santo Amaro não foi apenas a suspensão das leis da física, mas a perfeição de sua obediência. Ele não hesitou, não calculou o perigo, não questionou; simplesmente obedeceu por amor. A obediência hoje é uma palavra impopular, vista como fraqueza ou submissão humilhante. Mas Amaro nos mostra que a obediência a Deus e aos seus legítimos representantes é força libertadora. Ela nos livra do peso esmagador da nossa vontade própria, dos nossos caprichos e dúvidas. Quem obedece a Deus nunca erra. Que saibamos ouvir a voz de Deus e correr para o bem sem demora.",
+    prayer: "Santo Amaro, dai-nos uma obediência pronta, alegre e confiante.",
+    action: "Obedeça a um dever ou a uma inspiração de Deus imediatamente, sem procrastinar."
   },
   "16-1": {
     name: "São Marcelo I",
     title: "Papa",
-    history: "Defendeu a penitência como caminho de cura.",
-    reflection: "A misericórdia exige verdade. O perdão cura.",
-    prayer: "Dai-nos um coração contrito.",
-    action: "Faça um exame de consciência."
+    history: "Papa eleito após um longo período de sede vacante devido à perseguição de Diocleciano. Encontrou a Igreja em caos e dividida. Havia os 'lapsi' (caídos), cristãos que tinham renegado a fé e oferecido incenso aos ídolos por medo da morte, e que agora queriam voltar à comunhão sem penitência. Marcelo foi firme: acolhia a todos, mas exigia um caminho sério de penitência para curar a traição. Isso gerou revolta. O imperador Maxêncio, irritado com os tumultos, exilou o Papa e, segundo a lenda, forçou-o a trabalhar como escravo num estábulo (catabais) transformado em igreja.",
+    reflection: "São Marcelo sofreu não pelos pagãos, mas pelos próprios cristãos laxistas. Ele nos ensina que a Misericórdia de Deus é infinita, mas não é barata. Ela exige a nossa verdade, o nosso arrependimento real. Uma Igreja que não chama o pecado de pecado não pode oferecer o remédio da graça. Marcelo foi um verdadeiro médico de almas: sabia que aplicar um curativo sujo sobre uma ferida infectada (o perdão sem conversão) não cura, mas mata. Ele nos convida a levar a sério nossa vida espiritual, a fazer exames de consciência profundos e a valorizar o sacramento da Confissão como o lugar da ressurreição da alma.",
+    prayer: "Dai-nos, Senhor, um coração contrito e o amor pela vossa misericórdia exigente.",
+    action: "Faça um exame de consciência detalhado hoje e planeje sua confissão."
   },
   "17-1": {
     name: "Santo Antão",
     title: "Abade",
-    history: "Pai do deserto. Venceu o mal com oração.",
-    reflection: "O combate é interior. Crie silêncio para ser livre.",
-    prayer: "Santo Antão, fortalecei-nos.",
-    action: "15 min de silêncio hoje."
+    history: "Chamado 'o Grande', é o pai dos monges. Jovem egípcio rico, entrou numa igreja e ouviu o Evangelho: 'Se queres ser perfeito, vai, vende tudo o que tens, dá aos pobres e vem e segue-me'. Ele levou isso ao pé da letra. Retirou-se para o deserto, vivendo em tumbas e fortes abandonados. Lutou corpo a corpo, física e espiritualmente, com demônios que tentavam aterrorizá-lo ou seduzi-lo. Alcançou uma paz e sabedoria tão grandes que multidões iam ao deserto pedir seus conselhos e orações. Viveu mais de 100 anos.",
+    reflection: "Santo Antão inaugurou o 'martírio branco': dar a vida a Deus dia após dia na ascese, sem derramar sangue. Ele foi para o deserto não porque odiava o mundo, mas porque amava a Deus ardentemente e queria o combate real. Sua vida nos revela que o verdadeiro campo de batalha não é o mundo político ou exterior, mas o nosso próprio coração, onde lutam a graça e o pecado, a luz e as trevas. Antão venceu os demônios não com superpoderes, mas com a humildade, a oração e a confiança total no Nome de Jesus. Ele nos ensina a necessidade vital do silêncio, do jejum e da vigilância para manter a liberdade interior num mundo ruidoso.",
+    prayer: "Santo Antão, fortalecei-nos no combate contra o mal e dai-nos amor ao silêncio.",
+    action: "Fique 15 minutos em silêncio total hoje, sem celular, apenas na presença de Deus."
   },
   "18-1": {
     name: "Santa Margarida da Hungria",
     title: "Virgem",
-    history: "Princesa que escolheu ser serva no mosteiro.",
-    reflection: "A verdadeira nobreza é servir. Desapegue-se das honras.",
-    prayer: "Livrai-nos da vaidade.",
-    action: "Faça um serviço humilde."
+    history: "Filha do rei Bela IV da Hungria. Seus pais prometeram consagrá-la a Deus se o país fosse libertado da terrível invasão dos tártaros mongóis. A Hungria foi salva e, fiel à promessa, a menina foi para o mosteiro aos 3 anos. Crescendo, recusou dispensas papais para casar com reis poderosos (da Polônia e Boêmia), dizendo que preferia o Reino dos Céus. Viveu na mais estrita humildade, escolhendo os trabalhos mais repugnantes, cuidando das irmãs doentes e lavando pratos, apesar de ser princesa real.",
+    reflection: "Margarida poderia ter sido rainha no mundo, cercada de luxo, mas escolheu ser a última no convento, serva de todas. Sua vida é um tapa na nossa vaidade e busca incessante por status, likes e reconhecimento. Ela entendeu que a verdadeira nobreza não vem do sangue azul, mas de assemelhar-se a Cristo Servo, que lavou os pés dos discípulos. Margarida nos ensina o valor do sacrifício oculto, daquela entrega que ninguém vê e ninguém aplaude, mas que sustenta o mundo e a Igreja. A santidade é descer, é fazer-se pequeno para que Deus possa ser grande em nós.",
+    prayer: "Senhor, livrai-nos da vaidade e ensinai-nos a nobreza de servir.",
+    action: "Faça um serviço doméstico humilde que ninguém quer fazer, sem contar a ninguém."
   },
   "19-1": {
     name: "São Canuto",
     title: "Rei",
-    history: "Rei justo martirizado no altar.",
-    reflection: "O poder é para servir a justiça. Seja coerente.",
-    prayer: "Senhor, iluminai os governantes.",
-    action: "Reze pelas autoridades."
+    history: "Rei da Dinamarca no século XI. Homem de fé vigorosa, buscou evangelizar seu povo ainda semi-pagão e proteger os fracos contra a tirania dos nobres vikings. Impôs o dízimo para sustentar a Igreja e os pobres, o que gerou uma revolta camponesa incitada pelos nobres. Perseguido, refugiou-se na igreja de Santo Albano em Odense. Confessou-se, participou da Missa e foi assassinado a lançadas enquanto estava ajoelhado diante do altar, rezando pelos seus inimigos.",
+    reflection: "São Canuto nos mostra um rei que governou com a Cruz, não apenas com a espada. Ele entendeu que sua autoridade vinha de Deus e que ele prestaria contas dela; o poder era um serviço à justiça. Seu martírio diante do altar sela uma vida de coerência eucarística. Ele nos lembra que a política e a liderança são formas altas de caridade quando buscam o bem comum e a defesa da fé. Mas também nos alerta: quem segue a Cristo fielmente e desafia os interesses egoístas do mundo encontrará oposição e cruz. A coroa da santidade, muitas vezes, é tecida com espinhos antes de ser de glória.",
+    prayer: "Senhor, iluminai os governantes para que busquem a justiça e a vossa glória.",
+    action: "Reze pelas autoridades do seu país, para que governem com justiça."
   },
   "20-1": {
     name: "São Sebastião",
     title: "Mártir",
-    history: "Soldado que não renegou a fé. Sobreviveu às flechas.",
-    reflection: "Coragem! Não tenha medo de testemunhar Cristo.",
-    prayer: "São Sebastião, dai-nos força.",
-    action: "Faça o sinal da cruz em público."
+    history: "Soldado romano, chefe da guarda pretoriana de Diocleciano. O imperador gostava dele, sem saber que era cristão. Sebastião usava sua farda e cargo para visitar as prisões, levar a Eucaristia e encorajar os mártires a não desistirem. Descoberto, recusou renunciar a Cristo. Foi amarrado a um tronco e crivado de flechas pelos próprios arqueiros que comandava. Dado como morto, foi curado por Santa Irene. Recuperado, em vez de fugir, apresentou-se novamente ao imperador para reprovar sua crueldade. Foi então açoitado até a morte.",
+    reflection: "São Sebastião é o ícone da coragem dupla: a coragem física de enfrentar as flechas e a coragem moral ainda maior de voltar e confrontar o tirano e a injustiça após ter escapado. Ele não foi um fanático, mas um homem leal que sabia que a lealdade a Deus está acima da lealdade a César ou ao Estado. Ele nos ensina a não ter medo de testemunhar nossa fé em ambientes hostis, no trabalho ou na sociedade paganizada. As 'flechas' de hoje podem ser a zombaria, o cancelamento, o isolamento ou a crítica, mas Sebastião nos diz: 'Sê fiel até a morte, e eu te darei a coroa da vida'.",
+    prayer: "São Sebastião, dai-nos força e coragem para testemunhar a fé sem medo.",
+    action: "Faça o sinal da cruz em público (restaurante ou transporte) sem vergonha."
   },
   "21-1": {
     name: "Santa Inês",
     title: "Virgem",
-    history: "Menina que defendeu sua pureza até a morte.",
-    reflection: "A pureza é força. Proteja seu coração.",
-    prayer: "Santa Inês, guardai nossa pureza.",
-    action: "Evite conteúdos impuros."
+    history: "Uma menina romana de apenas 12 ou 13 anos. Rica e bela, recusou o filho do prefeito de Roma dizendo que já tinha um Esposo: Jesus Cristo. Furioso, o oficial expôs que ela era cristã (o que era crime). Foi arrastada para um prostíbulo para ser violada, mas Deus a protegeu milagrosamente, e nenhum homem conseguiu tocá-la. Tentaram queimá-la, mas o fogo se apagou. Por fim, foi degolada como um cordeiro. Seu túmulo na Via Nomentana tornou-se local de peregrinação mundial.",
+    reflection: "A fragilidade de uma criança como Inês confunde toda a força bruta do Império Romano. Seu nome significa 'cordeira' (agnus em latim) e 'pura' (hagne em grego). Ela nos mostra que a pureza não é ingenuidade ou fraqueza, é uma força de vontade titânica alimentada por um amor apaixonado. Inês sabia a Quem pertencia; seu corpo e alma eram de Cristo. Num mundo que banaliza o corpo, a sexualidade e a inocência, ela se ergue como testemunha de que o corpo é templo do Espírito Santo. Sua fidelidade até o sangue nos questiona: amamos a Cristo mais do que a nossa própria vida e prazer? A pureza de coração nos dá uma visão clara e uma coragem invencível.",
+    prayer: "Santa Inês, guardai nossa pureza e renovai nossa inocência.",
+    action: "Evite conteúdos impuros e reze pedindo a virtude da castidade."
   },
   "22-1": {
     name: "São Vicente",
     title: "Mártir",
-    history: "Diácono que sorriu diante da tortura.",
-    reflection: "A alegria cristã vence o mundo. Sorria na cruz.",
-    prayer: "São Vicente, dai-nos alegria.",
-    action: "Sorria para quem te incomoda."
+    history: "Diácono de Saragoça, Espanha. Preso junto com seu bispo, Valério. O bispo era gago e velho, então o jovem Vicente tomou a palavra diante do tribunal, fazendo uma defesa brilhante e desafiadora da fé. O governador, Daciano, enfureceu-se e submeteu Vicente a torturas refinadas: foi esticado no potro, teve a carne rasgada com ganchos de ferro e foi assado vivo sobre grelhas em brasa. A tradição diz que ele brincava e sorria durante o suplício, dizendo que estava 'assado de um lado, podiam virar para o outro', desestabilizando completamente seus algozes.",
+    reflection: "São Vicente nos ensina o segredo da alegria cristã invencível: ela não depende das circunstâncias externas, do conforto ou da ausência de dor, mas da união interior com Deus. Seus algozes podiam queimar seu corpo, mas não podiam tocar em sua alma, que já estava livre no Céu. O bom humor dos santos, mesmo na dor, é um sinal de soberania espiritual. Vicente venceu o mundo não com armas, mas com um sorriso que brotava da certeza da Ressurreição. Ele nos convida a enfrentar nossos pequenos sofrimentos diários sem dramatismo, sem vitimismo, com a leveza de quem sabe que 'os sofrimentos do tempo presente não têm proporção com a glória futura'.",
+    prayer: "São Vicente, dai-nos alegria na tribulação e constância na fé.",
+    action: "Sorria para quem te incomoda e não reclame de nada hoje."
   },
   "23-1": {
     name: "Santo Ildefonso",
     title: "Bispo",
-    history: "Defensor da virgindade de Maria. Recebeu a casula dela.",
-    reflection: "Ame a Mãe para agradar o Filho. Estude sua fé.",
-    prayer: "Santo Ildefonso, aumentai nosso amor a Maria.",
-    action: "Reze 3 Ave-Marias."
+    history: "Bispo de Toledo no século VII, sobrinho de Santo Eugênio. Foi um monge devotíssimo da Virgem Maria numa época em que hereges negavam a virgindade dela. Escreveu o tratado 'Sobre a Virgindade Perpétua de Santa Maria'. Uma noite, ao entrar na catedral para as matinas, encontrou a Virgem sentada em sua cátedra (cadeira episcopal), cercada de anjos. Ela lhe agradeceu a defesa e presenteou-o com uma casula tecida no céu, dizendo que ele a usaria nas festas dela.",
+    reflection: "Santo Ildefonso é o 'cavaleiro de Nossa Senhora'. Ele entendeu que não se pode amar a Jesus plenamente sem amar aquela que O trouxe ao mundo. Defender a honra da Mãe é defender a honra do Filho. Sua teologia não era especulação seca, era uma declaração de amor e gratidão. Ele nos ensina a piedade mariana não como um adorno sentimental, mas como via segura e teológica para Cristo. Quem é devoto de Maria nunca se perde, pois ela sempre aponta para Jesus ('Fazei tudo o que Ele vos disser'). Que saibamos honrar a Virgem com nosso estudo, nossa defesa e nossa devoção filial.",
+    prayer: "Santo Ildefonso, aumentai nosso amor a Maria e nossa fidelidade a Jesus.",
+    action: "Reze 3 Ave-Marias em honra à pureza de Nossa Senhora."
   },
   "24-1": {
     name: "São Francisco de Sales",
     title: "Doutor",
-    history: "O santo da doçura. Santidade para todos.",
-    reflection: "Fale a verdade com caridade. Seja santo no cotidiano.",
-    prayer: "Dai-nos mansidão, Senhor.",
-    action: "Seja amável com alguém difícil."
+    history: "Bispo de Genebra no século XVII, numa região dominada pelo calvinismo. Assumiu a missão perigosa de reconverter a região de Chablais. Foi rejeitado, dormiu ao relento, foi ameaçado. Como ninguém o ouvia, começou a escrever folhetos com a doutrina católica e a passá-los por baixo das portas (por isso é padroeiro dos jornalistas). Com sua doçura, paciência infinita e caridade, converteu 70 mil pessoas. Escreveu a 'Filoteia', ensinando que a santidade é possível para todos, leigos, soldados e donas de casa.",
+    reflection: "São Francisco de Sales é o mestre da santidade no cotidiano e da doçura apostólica. Ele revolucionou a espiritualidade ao ensinar que não é preciso ir para um mosteiro para ser santo; é possível ser santo na corte, na oficina, no exército ou na cozinha, santificando o dever de cada momento. Sua frase famosa, 'apanha-se mais moscas com uma gota de mel do que com um barril de vinagre', é um programa de vida. Ele nos ensina a lutar contra a ira, a ansiedade e a pressa, propondo a via da mansidão e da confiança. A santidade salesiana é o cumprimento extraordinário das tarefas ordinárias por amor a Deus.",
+    prayer: "Dai-nos mansidão, Senhor, e ensinai-nos a santificar o dia a dia.",
+    action: "Seja extremamente amável com alguém difícil ou chato hoje."
   },
   "25-1": {
     name: "Conversão de Paulo",
     title: "Apóstolo",
-    history: "O perseguidor que virou apóstolo.",
-    reflection: "Ninguém está perdido. Deus muda corações.",
-    prayer: "Convertei-me, Senhor.",
-    action: "Leia Atos 9."
+    history: "Saulo de Tarso era um fariseu zeloso, culto e violento. Acreditava estar servindo a Deus ao perseguir os cristãos, prendendo-os e aprovando suas mortes (como a de Estêvão). A caminho de Damasco para prender mais cristãos, foi derrubado do cavalo por uma luz ofuscante e ouviu a voz: 'Saulo, Saulo, por que me persegues?'. Ficou cego por três dias. Batizado por Ananias, o lobo virou cordeiro, o perseguidor virou o maior Apóstolo, levando o Evangelho às nações pagãs e escrevendo grande parte do Novo Testamento.",
+    reflection: "A conversão de Paulo é a prova definitiva de que ninguém é 'caso perdido' para Deus. A graça pode irromper na vida da pessoa mais distante, equivocada ou violenta e transformá-la radicalmente. Paulo aprendeu uma lição teológica fundamental na queda: perseguir a Igreja é perseguir o próprio Cristo ('Por que ME persegues?'), pois Cristo e a Igreja são um só corpo. Sua vida nos ensina que o zelo religioso sem amor pode ser cego e destrutivo. Mas, uma vez tocado por Cristo, Paulo canalizou toda a sua energia vulcânica para o bem. Ele nos convida a deixar cair as escamas do orgulho dos nossos olhos para ver que a salvação é graça imerecida, não conquista nossa.",
+    prayer: "Convertei-me, Senhor, e fazei-me apóstolo do vosso Nome.",
+    action: "Leia o relato da conversão em Atos 9 e reze pela conversão de alguém 'difícil'."
   },
   "26-1": {
     name: "Timóteo e Tito",
     title: "Bispos",
-    history: "Discípulos fiéis de Paulo.",
-    reflection: "A fé se transmite. Seja fiel à tradição.",
-    prayer: "Conservai-nos na fé dos apóstolos.",
-    action: "Agradeça a quem te evangelizou."
+    history: "Os dois colaboradores mais fiéis e amados de São Paulo. Timóteo, filho de pai grego e mãe judia, era jovem, talvez tímido e de saúde frágil, mas Paulo o chamava de 'meu verdadeiro filho na fé' e lhe confiou a igreja de Éfeso. Tito, de origem pagã, era um organizador vigoroso e diplomata, enviado por Paulo para resolver conflitos difíceis em Corinto e para organizar a igreja na ilha de Creta ('para que acabasses de organizar o que falta'). Receberam as chamadas 'Epístolas Pastorais'.",
+    reflection: "Esta festa celebra a amizade cristã e o mistério da sucessão apostólica. Paulo não trabalhava sozinho como um 'lobo solitário'; ele formou discípulos, confiou neles e preparou sua sucessão. Timóteo e Tito representam a continuidade da fé. A fé não é algo que inventamos a cada geração, é um depósito ('depositum fidei') que recebemos, guardamos e devemos transmitir intacto. Eles nos ensinam que Deus usa temperamentos diferentes para Sua obra. Não precisamos ter a personalidade vulcânica de Paulo para sermos santos; podemos servir a Deus com nossa timidez (Timóteo) ou nossa capacidade administrativa (Tito), desde que fiéis à Tradição recebida.",
+    prayer: "Conservai-nos, Senhor, na fé dos apóstolos e na amizade santa.",
+    action: "Agradeça a quem te evangelizou ou te ajudou na fé (padrinho, catequista, amigo)."
   },
   "27-1": {
     name: "Santa Ângela Mérici",
     title: "Fundadora",
-    history: "Pioneira na educação feminina.",
-    reflection: "Educar é amar. Transforme a família pela fé.",
-    prayer: "Abençoai os educadores.",
-    action: "Ensine algo bom a alguém."
+    history: "Italiana do Renascimento. Ficou órfã cedo e tornou-se terciária franciscana. Teve uma visão de uma escada que subia ao céu com virgens subindo e descendo. Numa época em que a mulher só tinha dois caminhos (casamento ou clausura estrita), Ângela inovou: fundou a Companhia de Santa Úrsula (Ursulinas), mulheres consagradas a Deus que viviam no mundo, sem hábito, dedicadas a educar as meninas e santificar a família a partir de dentro. Foi uma pioneira da educação feminina.",
+    reflection: "Santa Ângela foi uma visionária profética. Ela percebeu que a sociedade estava corrompida porque a família estava corrompida, e a família estava assim porque as mães não eram educadas na fé e nos valores. Seu lema era 'Educar é amar'. Ela nos ensina a importância estratégica da formação da mulher para a regeneração da cultura. Ângela nos convida a ter os olhos abertos para as necessidades reais do nosso tempo e a responder com criatividade e coragem, sem esperar que as soluções venham de cima ou das estruturas antigas. A santidade é fermento na massa.",
+    prayer: "Abençoai os educadores e as famílias, Senhor, por intercessão de Santa Ângela.",
+    action: "Ensine algo bom a alguém ou valorize o trabalho de uma mulher em sua vida."
   },
   "28-1": {
     name: "São Tomás de Aquino",
     title: "Doutor",
-    history: "Gênio que uniu fé e razão.",
-    reflection: "Estudar é rezar. Busque a Verdade.",
-    prayer: "Dai-nos inteligência e amor.",
-    action: "Estude o Catecismo."
+    history: "Nobre italiano que fugiu de casa para ser mendicante dominicano (sua família chegou a prendê-lo num castelo e enviar uma prostituta para tentá-lo, a quem ele expulsou com um tição em brasa). Chamado 'Boi Mudo' por ser grande e silencioso, tornou-se o maior teólogo da história. Uniu a filosofia de Aristóteles com a fé cristã na 'Suma Teológica'. Apesar de sua inteligência colossal, era um místico humilde. Ao fim da vida, teve uma revelação de Deus e parou de escrever, dizendo: 'Tudo o que escrevi parece palha diante do que vi'.",
+    reflection: "São Tomás nos ensina a amar a Deus com a inteligência ('fides quaerens intellectum'). Ele nos mostra que a Fé não teme a Razão e a Ciência; ambas vêm da mesma fonte, que é Deus, e não podem se contradizer. Num mundo de sentimentalismo religioso e irracionalidade, Tomás é a rocha que nos lembra que a Verdade existe, é objetiva e pode ser conhecida. Mas seu intelectualismo não era frio; ele compôs os hinos eucarísticos mais belos e ardentes (como o 'Tantum Ergo' e 'Adoro te Devote'). Ele nos ensina a humildade intelectual: quanto mais sabemos de Deus, mais percebemos o quanto Ele nos ultrapassa. Estudar é também uma forma alta de rezar.",
+    prayer: "Dai-nos inteligência e amor, Senhor, para vos conhecer e vos servir.",
+    action: "Estude um ponto do Catecismo ou leia algo sobre a Eucaristia."
   },
   "29-1": {
     name: "São Pedro Nolasco",
     title: "Fundador",
-    history: "Dava a vida para resgatar cativos.",
-    reflection: "Liberte os irmãos das correntes do mal.",
-    prayer: "Libertai os oprimidos.",
-    action: "Ajude quem sofre."
+    history: "Mercador francês radicado em Barcelona. Comovido com o sofrimento dos cristãos escravizados pelos mouros no norte da África, gastou toda a sua fortuna para resgatá-los. Quando o dinheiro acabou, teve uma visão da Virgem das Mercês e fundou a Ordem dos Mercedários. A novidade radical era o quarto voto: além de pobreza, castidade e obediência, os mercedários juravam oferecer-se como reféns no lugar dos cativos se não houvesse dinheiro para o resgate, trocando sua liberdade pela do irmão.",
+    reflection: "São Pedro Nolasco levou o amor ao extremo da substituição vicária: trocar a própria liberdade e vida pela liberdade do irmão desconhecido. Isso é a imitação perfeita de Cristo, que se entregou na Cruz para nos resgatar do pecado. Hoje, talvez não precisemos nos entregar fisicamente em cativeiro, mas somos chamados a gastar nossa vida, nosso tempo e nossos recursos para libertar os outros das novas escravidões: solidão, ignorância, miséria e vício. A liberdade cristã não é fazer o que se quer, é a liberdade para servir e amar até o fim. Nolasco nos pergunta: o que estamos dispostos a pagar pela salvação do nosso próximo?",
+    prayer: "Libertai os oprimidos e dai-nos generosidade heróica, Senhor.",
+    action: "Ajude quem sofre ou se sente 'preso' em alguma situação difícil."
   },
   "30-1": {
     name: "Santa Jacinta Mariscotti",
     title: "Penitente",
-    history: "De vaidosa a santa penitente.",
-    reflection: "Nunca é tarde para mudar. Deixe a vaidade.",
-    prayer: "Dai-nos um coração humilde.",
-    action: "Pratique a humildade."
+    history: "Nobre italiana orgulhosa e vaidosa. Queria casar-se, mas sua irmã mais nova casou-se com seu pretendente. Frustrada e amarga, entrou no convento sem vocação. Viveu 10 anos em escândalo: transformou sua cela em apartamento de luxo, recebia visitas e vivia sem espírito religioso. Após uma doença grave e a exortação dura de um confessor, converteu-se. Fez uma fogueira com suas roupas de luxo no pátio e passou a viver uma vida de extrema penitência, humildade e caridade com as irmãs, tornando-se uma grande santa.",
+    reflection: "A história de Jacinta é um alerta severo e um consolo imenso. Alerta contra a mediocridade: é possível estar no 'lugar certo' (Igreja/convento) com o 'coração errado'. O hábito não faz o monge. Mas é consolo porque mostra que nunca é tarde para recomeçar. Deus teve paciência com sua vaidade e amargura por anos, esperando o momento do 'sim'. Jacinta passou da futilidade à santidade heroica. Ela nos ensina que não importa o quanto erramos ou quanto tempo perdemos; o que importa é a decisão de hoje. A santidade é a arte de recomeçar sempre, transformando o fracasso em trampolim para Deus.",
+    prayer: "Dai-nos um coração humilde e a graça da conversão diária.",
+    action: "Pratique a humildade aceitando uma correção ou crítica sem se justificar."
   },
   "31-1": {
     name: "São João Bosco",
     title: "Pai da Juventude",
-    history: "Salvou jovens com amor e alegria.",
-    reflection: "Santidade é alegria. Ame para educar.",
-    prayer: "São João Bosco, salvai a juventude.",
-    action: "Seja alegre hoje."
+    history: "Camponês pobre do Piemonte, órfão de pai, teve um sonho profético aos 9 anos onde transformava feras em cordeiros. Tornou-se padre em Turim durante a Revolução Industrial, vendo jovens abandonados, explorados e presos. Criou o Oratório: casa que acolhe, paróquia que evangeliza, escola que encaminha para a vida e pátio onde se encontram amigos. Seu 'Sistema Preventivo' baseava-se não em castigos, mas em razão, religião e 'amorevolezza' (amor demonstrado). Fez milagres impressionantes (multiplicação de pães, hóstias, curas), mas seu maior milagre foi amar os jovens pobres.",
+    reflection: "Dom Bosco é a encarnação da alegria de Deus e da pedagogia do amor. Ele dizia que 'santidade consiste em estar sempre alegres'. Ele salvou milhares de jovens da rua e do crime não com punições ou moralismo, mas fazendo-os sentir-se amados e úteis. Ele nos ensina que a educação e a evangelização exigem presença e afeto real. 'Não basta amar, é preciso que eles saibam que são amados'. Dom Bosco nos convida a olhar para a juventude não como um problema ou ameaça, mas como terra sagrada e promessa. Sua vida nos prova que é possível formar 'bons cristãos e honestos cidadãos' com a doçura do Bom Pastor.",
+    prayer: "São João Bosco, salvai a juventude e dai-nos a vossa alegria contagiante.",
+    action: "Seja alegre hoje e trate os jovens/crianças com carinho especial."
   }
 };
 
-export default function DevocionalApp() {
+export default function App() {
   // Inicializa em 01/12/2025 para começar a jornada
   const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 1)); 
   const [view, setView] = useState('cover'); 
@@ -534,6 +552,7 @@ export default function DevocionalApp() {
   // Bloqueio de meses (Apenas Dez e Jan liberados)
   const isMonthLocked = (date) => {
     const month = date.getMonth();
+    // 11 = Dezembro, 0 = Janeiro
     return month !== 11 && month !== 0; 
   };
 
@@ -550,10 +569,10 @@ export default function DevocionalApp() {
     return {
       name: "Dia de Oração",
       title: "Feria",
-      history: "Dia dedicado à oração silenciosa e ao trabalho santificado.",
-      reflection: "Aproveite este dia para colocar em dia suas leituras espirituais.",
-      prayer: "Senhor, santificai o meu dia.",
-      action: "Reze um Pai Nosso.",
+      history: "Dia dedicado à oração silenciosa e ao trabalho santificado. Aproveite para revisitar a vida dos santos anteriores ou dedicar-se à leitura espiritual.",
+      reflection: "Nem todos os dias têm festas solenes, mas todo dia é dia de santidade. A rotina silenciosa é o lugar onde a fé cria raízes. Deus não está apenas nos grandes eventos, mas na brisa suave do cotidiano.",
+      prayer: "Senhor, santificai o meu dia e o meu trabalho.",
+      action: "Reze um Pai Nosso e ofereça seu trabalho a Deus.",
       isSpecial: false
     };
   };
@@ -604,7 +623,7 @@ export default function DevocionalApp() {
 
           <div className="p-8 flex flex-col items-center text-center space-y-6">
             <div className="mb-4">
-              <Cross size={48} className="text-red-900 mx-auto mb-2" strokeWidth={1} />
+              <ChristianCross size={48} className="text-red-900 mx-auto mb-2" strokeWidth={1} />
               <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-yellow-700">Devotionis Sanctorum</p>
             </div>
             <div className="space-y-2">
@@ -663,7 +682,7 @@ export default function DevocionalApp() {
         <div className="max-w-md mx-auto px-4 h-18 py-3 flex items-center justify-between">
           <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-full hover:bg-yellow-50 transition-colors text-yellow-700">{menuOpen ? <X size={24} /> : <Menu size={24} />}</button>
           <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2 mb-1"><Cross size={12} className="text-yellow-600" /><span className={`text-xs uppercase tracking-[0.2em] font-bold ${colors.cardinal}`}>Ordo</span><Cross size={12} className="text-yellow-600" /></div>
+            <div className="flex items-center gap-2 mb-1"><ChristianCross size={12} className="text-yellow-600" /><span className={`text-xs uppercase tracking-[0.2em] font-bold ${colors.cardinal}`}>Ordo</span><ChristianCross size={12} className="text-yellow-600" /></div>
             <span className={`text-xl font-medium font-serif italic ${colors.gold}`}>Sanctórum</span>
           </div>
           <div className="flex gap-2"><button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full hover:bg-yellow-50 transition-colors text-yellow-700">{darkMode ? <Sun size={20} /> : <Moon size={20} />}</button></div>
@@ -772,7 +791,7 @@ export default function DevocionalApp() {
                 )
               })}
             </div>
-            <div className="text-center mt-8 space-y-2"><div className="w-8 h-8 mx-auto text-yellow-600 opacity-50"><Cross size={20} strokeWidth={1} /></div><p className="text-xs opacity-60 font-serif italic max-w-xs mx-auto">{currentDate.getMonth() !== 0 && currentDate.getMonth() !== 11 ? "Conteúdo reservado para o tempo oportuno." : "Selecione um dia para o Devocional."}</p></div>
+            <div className="text-center mt-8 space-y-2"><div className="w-8 h-8 mx-auto text-yellow-600 opacity-50"><ChristianCross size={20} strokeWidth={1} /></div><p className="text-xs opacity-60 font-serif italic max-w-xs mx-auto">{currentDate.getMonth() !== 0 && currentDate.getMonth() !== 11 ? "Conteúdo reservado para o tempo oportuno." : "Selecione um dia para o Devocional."}</p></div>
           </div>
         )}
 
